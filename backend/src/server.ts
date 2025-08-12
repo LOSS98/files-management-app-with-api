@@ -10,20 +10,35 @@ import { fileRoutes } from './routes/files';
 
 const fastify = Fastify({ 
     logger: true,
-    bodyLimit: 1024 * 1024 * 1024
+    bodyLimit: (parseInt(process.env.BODY_LIMIT || '1024') * 1024 * 1024)
 });
 
 async function start() {
     await fastify.register(cors, {
-        origin: process.env.NODE_ENV === 'production' 
-            ? ['http://localhost:3002', 'https://your-domain.com']
-            : true,
-        credentials: true
+        origin: (origin, callback) => {
+            const envOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
+            const allowedOrigins: (string | RegExp)[] = [
+                ...envOrigins,
+                /\.cloudflare\.com$/,
+                /\.workers\.dev$/
+            ];
+            
+            if (!origin || allowedOrigins.some(allowed => 
+                typeof allowed === 'string' ? allowed === origin : allowed.test(origin)
+            )) {
+                callback(null, true);
+            } else {
+                callback(null, false);
+            }
+        },
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key']
     });
 
     await fastify.register(multipart, {
         limits: {
-            fileSize: 1024 * 1024 * 1024
+            fileSize: (parseInt(process.env.MAX_FILE_SIZE || '1024') * 1024 * 1024)
         }
     });
 

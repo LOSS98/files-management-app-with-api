@@ -108,7 +108,7 @@ GET    /api/files/files/:id/download        # Download file
 
 ### File Upload Restrictions
 - **Allowed Types**: JPEG, PNG, GIF, WebP, PDF, Plain Text
-- **Max Size**: 1GB
+- **Max Size**: Configurable via `MAX_FILE_SIZE` env var (default: 1GB)
 - **Security**: Filename sanitization, type validation
 
 ## 🏗️ Architecture
@@ -193,6 +193,13 @@ CREATE TABLE files (
 NODE_ENV=production
 JWT_SECRET=your-super-secure-256-bit-secret-key
 ADMIN_PASSWORD=your-secure-admin-password
+
+# CORS Configuration
+ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3002,https://your-domain.com
+
+# File Upload Configuration (in MB)
+MAX_FILE_SIZE=1024
+BODY_LIMIT=1024
 ```
 
 ### Development Commands
