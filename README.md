@@ -29,8 +29,8 @@ A modern, secure file management system with multi-application support. Built wi
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/file-manager.git
-cd file-manager
+git clone https://github.com/LOSS98/files-management-app-with-api.git
+cd files-management-app-with-api
 
 # Install all dependencies
 npm run install:all
@@ -48,15 +48,18 @@ npm run dev
 - **API Server**: http://localhost:3001  
 - **Default Login**: `admin` / `admin123`
 
-## 🐳 Docker Deployment
+## 🐳 Docker Deployment (Recommandé)
 
 ```bash
 # Start with Docker Compose
-docker-compose up --build
-
-# Background mode
 docker-compose up -d --build
+
+# Check status
+docker-compose ps
+docker-compose logs -f
 ```
+
+**Pour un déploiement en production complet avec SSL:** Voir [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ## 📖 API Documentation
 
@@ -254,8 +257,8 @@ sudo apt-get install -y nodejs
 sudo apt-get install -y build-essential
 
 # Clone repository
-git clone https://github.com/your-username/file-manager.git
-cd file-manager
+git clone https://github.com/LOSS98/files-management-app-with-api.git
+cd files-management-app-with-api
 ```
 
 #### Step 2: Application Build
@@ -305,59 +308,6 @@ server {
     
     # Redirect HTTP to HTTPS
     return 301 https://$server_name$request_uri;
-}
-
-server {
-    listen 443 ssl http2;
-    server_name your-domain.com www.your-domain.com;
-    
-    # SSL Configuration (will be added by Certbot)
-    ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
-    
-    # Security headers
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-XSS-Protection "1; mode=block" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header Referrer-Policy "no-referrer-when-downgrade" always;
-    add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline'" always;
-    
-    # Frontend - Static files
-    location / {
-        root /var/www/file-manager/frontend/dist;
-        try_files $uri $uri/ /index.html;
-        
-        # Cache static assets
-        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
-            expires 1y;
-            add_header Cache-Control "public, immutable";
-        }
-    }
-    
-    # Backend API
-    location /api {
-        proxy_pass http://localhost:3001;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-        
-        # File upload size limit
-        client_max_body_size 1G;
-    }
-    
-    # File downloads
-    location /uploads {
-        proxy_pass http://localhost:3001;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
 }
 ```
 
@@ -536,12 +486,6 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 4. Test thoroughly
 5. Submit a pull request
 
-### Code Standards
-- TypeScript strict mode
-- No comments in code
-- Clean, self-documenting code
-- Security-first approach
-- Comprehensive input validation
 
 ## 📄 License
 

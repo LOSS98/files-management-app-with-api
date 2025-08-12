@@ -11,9 +11,9 @@ Be respectful and inclusive. We're building this project together.
 ### 1. Fork and Clone
 
 ```bash
-git fork https://github.com/your-username/file-manager
-git clone https://github.com/your-username/file-manager.git
-cd file-manager
+git fork https://github.com/LOSS98/files-management-app-with-api
+git clone https://github.com/LOSS98/files-management-app-with-api.git
+cd files-management-app-with-api
 ```
 
 ### 2. Set up Development Environment
