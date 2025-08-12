@@ -13,7 +13,8 @@
     "start:frontend": "cd frontend && npm run preview"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "typescript": "^5.9.2"
   },
   "keywords": ["file-manager", "api", "react", "fastify", "typescript", "security", "multi-application"],
   "author": "File Manager Contributors",
