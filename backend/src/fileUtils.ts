@@ -17,16 +17,19 @@ export function generateUniqueFileName(originalName: string): string {
     return `${nameWithoutExt}_${uuidv4()}${ext}`;
 }
 
-export async function convertImageToSvg(inputPath: string, outputPath: string): Promise<void> {
+export async function convertImageToWebp(inputPath: string, outputPath: string): Promise<void> {
     const buffer = await fs.readFile(inputPath);
-    const { width, height } = await sharp(buffer).metadata();
+    const webpBuffer = await sharp(buffer)
+        .webp({ 
+            quality: 40,
+            effort: 6,
+            lossless: false,
+            nearLossless: false,
+            smartSubsample: true
+        })
+        .toBuffer();
     
-    const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
-<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <image width="${width}" height="${height}" xlink:href="data:image/png;base64,${buffer.toString('base64')}"/>
-</svg>`;
-    
-    await fs.writeFile(outputPath, svgContent);
+    await fs.writeFile(outputPath, webpBuffer);
 }
 
 export async function deleteFile(filePath: string): Promise<void> {

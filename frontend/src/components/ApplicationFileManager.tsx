@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { adminAPI, createFileAPI } from '../services/api';
+import { userAPI, createFileAPI, getErrorMessage } from '../services/api';
 import { Application, FileRecord } from '../types';
 import { formatDate } from '../utils/dateFormatter';
-import { Upload, Download, Edit2, Trash2, Image } from 'lucide-react';
+import { Upload, Download, Edit2, Trash2, Image, AlertCircle } from 'lucide-react';
 
 export function ApplicationFileManager() {
     const { id } = useParams<{ id: string }>();
@@ -12,6 +12,8 @@ export function ApplicationFileManager() {
     const [isLoading, setIsLoading] = useState(true);
     const [uploadFile, setUploadFile] = useState<File | null>(null);
     const [editingFile, setEditingFile] = useState<{ id: string; name: string } | null>(null);
+    const [error, setError] = useState('');
+    const [isUploading, setIsUploading] = useState(false);
 
     useEffect(() => {
         if (id) {
@@ -21,7 +23,7 @@ export function ApplicationFileManager() {
 
     const loadApplication = async () => {
         try {
-            const appsResponse = await adminAPI.getApplications();
+            const appsResponse = await userAPI.getApplications();
             const app = appsResponse.data.applications.find((a: Application) => a.id === id);
 
             if (app) {
@@ -29,9 +31,10 @@ export function ApplicationFileManager() {
                 const fileAPI = createFileAPI(app.api_key);
                 const filesResponse = await fileAPI.getFiles();
                 setFiles(filesResponse.data.files);
+                setError('');
             }
         } catch (error) {
-            console.error('Error loading application:', error);
+            setError(getErrorMessage(error));
         } finally {
             setIsLoading(false);
         }
@@ -41,13 +44,18 @@ export function ApplicationFileManager() {
         e.preventDefault();
         if (!uploadFile || !application) return;
 
+        setIsUploading(true);
+        setError('');
+
         try {
             const fileAPI = createFileAPI(application.api_key);
             await fileAPI.uploadFile(uploadFile);
             setUploadFile(null);
             loadApplication();
         } catch (error) {
-            console.error('Error uploading file:', error);
+            setError(getErrorMessage(error));
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -59,8 +67,9 @@ export function ApplicationFileManager() {
             await fileAPI.renameFile(fileId, newName);
             setEditingFile(null);
             loadApplication();
+            setError('');
         } catch (error) {
-            console.error('Error renaming file:', error);
+            setError(getErrorMessage(error));
         }
     };
 
@@ -71,20 +80,22 @@ export function ApplicationFileManager() {
             const fileAPI = createFileAPI(application.api_key);
             await fileAPI.deleteFile(fileId);
             loadApplication();
+            setError('');
         } catch (error) {
-            console.error('Error deleting file:', error);
+            setError(getErrorMessage(error));
         }
     };
 
-    const handleConvertToSvg = async (fileId: string) => {
+    const handleConvertToWebp = async (fileId: string) => {
         if (!application) return;
 
         try {
             const fileAPI = createFileAPI(application.api_key);
-            await fileAPI.convertToSvg(fileId);
+            await fileAPI.convertToWebp(fileId);
             loadApplication();
+            setError('');
         } catch (error) {
-            console.error('Error converting to SVG:', error);
+            setError(getErrorMessage(error));
         }
     };
 
@@ -103,8 +114,9 @@ export function ApplicationFileManager() {
             link.click();
             link.remove();
             window.URL.revokeObjectURL(url);
+            setError('');
         } catch (error) {
-            console.error('Error downloading file:', error);
+            setError(getErrorMessage(error));
         }
     };
 
@@ -143,6 +155,17 @@ export function ApplicationFileManager() {
                 </p>
             </div>
 
+            {error && (
+                <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+                    <div className="flex">
+                        <AlertCircle className="h-5 w-5 text-red-400" />
+                        <div className="ml-3">
+                            <p className="text-sm text-red-700">{error}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="mb-6 bg-white shadow sm:rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                     <h3 className="text-lg leading-6 font-medium text-gray-900">Upload File</h3>
@@ -155,11 +178,11 @@ export function ApplicationFileManager() {
                             />
                             <button
                                 type="submit"
-                                disabled={!uploadFile}
+                                disabled={!uploadFile || isUploading}
                                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                             >
                                 <Upload className="h-4 w-4 mr-2" />
-                                Upload
+                                {isUploading ? 'Uploading...' : 'Upload'}
                             </button>
                         </div>
                     </form>
@@ -206,11 +229,11 @@ export function ApplicationFileManager() {
                                     )}
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    {file.file_type.startsWith('image/') && file.file_type !== 'image/svg+xml' && (
+                                    {file.file_type.startsWith('image/') && file.file_type !== 'image/webp' && (
                                         <button
-                                            onClick={() => handleConvertToSvg(file.id)}
+                                            onClick={() => handleConvertToWebp(file.id)}
                                             className="text-purple-600 hover:text-purple-900"
-                                            title="Convert to SVG"
+                                            title="Convert to WebP"
                                         >
                                             <Image className="h-4 w-4" />
                                         </button>

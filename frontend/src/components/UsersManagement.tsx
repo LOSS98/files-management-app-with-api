@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
-import { adminAPI } from '../services/api';
+import { adminAPI, getErrorMessage } from '../services/api';
 import { User } from '../types';
 import { formatDate } from '../utils/dateFormatter';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, AlertCircle } from 'lucide-react';
 
 export function UsersManagement() {
     const [users, setUsers] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [newUser, setNewUser] = useState({ username: '', password: '', role: 'user' });
+    const [error, setError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         loadUsers();
@@ -18,8 +20,9 @@ export function UsersManagement() {
         try {
             const response = await adminAPI.getUsers();
             setUsers(response.data.users);
+            setError('');
         } catch (error) {
-            console.error('Error loading users:', error);
+            setError(getErrorMessage(error));
         } finally {
             setIsLoading(false);
         }
@@ -27,13 +30,29 @@ export function UsersManagement() {
 
     const handleCreateUser = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (!newUser.username.trim() || !newUser.password.trim()) {
+            setError('Username and password are required');
+            return;
+        }
+        
+        if (newUser.password.length < 8) {
+            setError('Password must be at least 8 characters long');
+            return;
+        }
+        
+        setIsSubmitting(true);
+        setError('');
+        
         try {
             await adminAPI.createUser(newUser);
             setNewUser({ username: '', password: '', role: 'user' });
             setShowCreateForm(false);
             loadUsers();
         } catch (error) {
-            console.error('Error creating user:', error);
+            setError(getErrorMessage(error));
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -42,8 +61,9 @@ export function UsersManagement() {
             try {
                 await adminAPI.deleteUser(id);
                 loadUsers();
+                setError('');
             } catch (error) {
-                console.error('Error deleting user:', error);
+                setError(getErrorMessage(error));
             }
         }
     };
@@ -74,6 +94,17 @@ export function UsersManagement() {
                 </div>
             </div>
 
+            {error && (
+                <div className="mt-6 bg-red-50 border border-red-200 rounded-md p-4">
+                    <div className="flex">
+                        <AlertCircle className="h-5 w-5 text-red-400" />
+                        <div className="ml-3">
+                            <p className="text-sm text-red-700">{error}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {showCreateForm && (
                 <div className="mt-6 bg-white shadow sm:rounded-lg">
                     <div className="px-4 py-5 sm:p-6">
@@ -87,16 +118,19 @@ export function UsersManagement() {
                                     className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                     value={newUser.username}
                                     onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+                                    disabled={isSubmitting}
                                 />
                             </div>
                             <div>
                                 <input
                                     type="password"
-                                    placeholder="Password"
+                                    placeholder="Password (min 8 characters)"
                                     required
+                                    minLength={8}
                                     className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                     value={newUser.password}
                                     onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                                    disabled={isSubmitting}
                                 />
                             </div>
                             <div>
@@ -104,6 +138,7 @@ export function UsersManagement() {
                                     className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                     value={newUser.role}
                                     onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                                    disabled={isSubmitting}
                                 >
                                     <option value="user">User</option>
                                     <option value="admin">Admin</option>
@@ -112,14 +147,20 @@ export function UsersManagement() {
                             <div className="flex space-x-3">
                                 <button
                                     type="submit"
-                                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                    disabled={isSubmitting}
+                                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
                                 >
-                                    Create User
+                                    {isSubmitting ? 'Creating...' : 'Create User'}
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => setShowCreateForm(false)}
-                                    className="inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                    onClick={() => {
+                                        setShowCreateForm(false);
+                                        setError('');
+                                        setNewUser({ username: '', password: '', role: 'user' });
+                                    }}
+                                    disabled={isSubmitting}
+                                    className="inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
                                 >
                                     Cancel
                                 </button>

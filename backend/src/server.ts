@@ -5,9 +5,13 @@ import staticFiles from '@fastify/static';
 import path from 'path';
 import { authRoutes } from './routes/auth';
 import { adminRoutes } from './routes/admin';
+import { userRoutes } from './routes/user';
 import { fileRoutes } from './routes/files';
 
-const fastify = Fastify({ logger: true });
+const fastify = Fastify({ 
+    logger: true,
+    bodyLimit: 1024 * 1024 * 1024
+});
 
 async function start() {
     await fastify.register(cors, {
@@ -17,7 +21,11 @@ async function start() {
         credentials: true
     });
 
-    await fastify.register(multipart);
+    await fastify.register(multipart, {
+        limits: {
+            fileSize: 1024 * 1024 * 1024
+        }
+    });
 
     await fastify.register(staticFiles, {
         root: path.join(__dirname, '../uploads'),
@@ -26,6 +34,7 @@ async function start() {
 
     await fastify.register(authRoutes, { prefix: '/api/auth' });
     await fastify.register(adminRoutes, { prefix: '/api/admin' });
+    await fastify.register(userRoutes, { prefix: '/api/user' });
     await fastify.register(fileRoutes, { prefix: '/api/files' });
 
     fastify.setErrorHandler((error, request, reply) => {

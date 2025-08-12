@@ -11,7 +11,7 @@ A modern, secure file management system with multi-application support. Built wi
 
 - **🔐 Dual Authentication**: JWT for admin panel, API keys for applications
 - **📁 Multi-Application Support**: Isolated file storage per application
-- **🖼️ Image Processing**: Convert images to SVG format
+- **🖼️ Image Processing**: Convert images to WebP format for compression
 - **🛡️ Security First**: Input validation, file type restrictions, secure authentication
 - **⚡ Modern Stack**: TypeScript, React, Fastify, SQLite
 - **🐳 Docker Ready**: Complete containerization support
@@ -98,14 +98,14 @@ PUT    /api/admin/applications/:id/regenerate-key # Regenerate API key
 POST   /api/files/upload                    # Upload file
 GET    /api/files/files                     # List files
 PUT    /api/files/files/:id/rename          # Rename file
-POST   /api/files/files/:id/convert-to-svg  # Convert image to SVG
+POST   /api/files/files/:id/convert-to-webp  # Convert image to WebP
 DELETE /api/files/files/:id                 # Delete file
 GET    /api/files/files/:id/download        # Download file
 ```
 
 ### File Upload Restrictions
 - **Allowed Types**: JPEG, PNG, GIF, WebP, PDF, Plain Text
-- **Max Size**: 10MB
+- **Max Size**: 1GB
 - **Security**: Filename sanitization, type validation
 
 ## 🏗️ Architecture
@@ -347,7 +347,7 @@ server {
         proxy_cache_bypass $http_upgrade;
         
         # File upload size limit
-        client_max_body_size 10M;
+        client_max_body_size 1G;
     }
     
     # File downloads
@@ -564,7 +564,7 @@ For security concerns, please review our [Security Policy](SECURITY.md).
 - **Frontend**: React 18.3+ + TypeScript + Tailwind CSS
 - **Security**: JWT + API Keys + Input Validation
 - **File Support**: Images, PDFs, Text files
-- **Max File Size**: 10MB
+- **Max File Size**: 1GB
 - **Date Format**: dd/mm/yyyy (French)
 
 ---

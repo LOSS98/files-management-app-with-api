@@ -27,7 +27,7 @@ export interface FileRecord {
 export interface AuthContextType {
     user: User | null;
     token: string | null;
-    login: (username: string, password: string) => Promise<boolean>;
+    login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>;
     logout: () => void;
     isLoading: boolean;
 }

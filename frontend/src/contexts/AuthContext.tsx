@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authAPI } from '../services/api';
+import { authAPI, getErrorMessage } from '../services/api';
 import { User, AuthContextType } from '../types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,7 +24,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setIsLoading(false);
     }, []);
 
-    const login = async (username: string, password: string): Promise<boolean> => {
+    const login = async (username: string, password: string): Promise<{ success: boolean; error?: string }> => {
         try {
             const response = await authAPI.login(username, password);
             const { token: newToken, user: newUser } = response.data;
@@ -34,9 +34,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
             localStorage.setItem('token', newToken);
             localStorage.setItem('user', JSON.stringify(newUser));
 
-            return true;
-        } catch {
-            return false;
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: getErrorMessage(error) };
         }
     };
 

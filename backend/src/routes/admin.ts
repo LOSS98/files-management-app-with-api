@@ -22,9 +22,29 @@ export async function adminRoutes(fastify: FastifyInstance) {
             reply.code(400).send({ error: 'Username, password, and role are required' });
             return;
         }
+
+        if (!username.trim()) {
+            reply.code(400).send({ error: 'Username cannot be empty' });
+            return;
+        }
+
+        if (username.length < 3) {
+            reply.code(400).send({ error: 'Username must be at least 3 characters long' });
+            return;
+        }
+
+        if (username.length > 30) {
+            reply.code(400).send({ error: 'Username must be less than 30 characters' });
+            return;
+        }
         
         if (password.length < 8) {
             reply.code(400).send({ error: 'Password must be at least 8 characters long' });
+            return;
+        }
+
+        if (password.length > 100) {
+            reply.code(400).send({ error: 'Password must be less than 100 characters' });
             return;
         }
         
@@ -54,13 +74,30 @@ export async function adminRoutes(fastify: FastifyInstance) {
         return { success: true };
     });
 
-    fastify.get('/applications', async () => {
-        const applications = await database.all('SELECT * FROM applications');
-        return { applications };
-    });
 
     fastify.post('/applications', async (request, reply) => {
         const { name } = request.body as { name: string };
+
+        if (!name || !name.trim()) {
+            reply.code(400).send({ error: 'Application name is required' });
+            return;
+        }
+
+        if (name.length < 3) {
+            reply.code(400).send({ error: 'Application name must be at least 3 characters long' });
+            return;
+        }
+
+        if (name.length > 50) {
+            reply.code(400).send({ error: 'Application name must be less than 50 characters' });
+            return;
+        }
+
+        const sanitizedName = name.replace(/[<>:"/\|?*]/g, '_');
+        if (sanitizedName !== name) {
+            reply.code(400).send({ error: 'Application name contains invalid characters' });
+            return;
+        }
 
         try {
             const appId = uuidv4();

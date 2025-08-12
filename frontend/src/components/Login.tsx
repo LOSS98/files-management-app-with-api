@@ -23,9 +23,9 @@ export function Login() {
             return;
         }
 
-        const success = await login(username, password);
-        if (!success) {
-            setError('Invalid credentials');
+        const result = await login(username, password);
+        if (!result.success) {
+            setError(result.error || 'Login failed');
             if (usernameRef.current) usernameRef.current.value = '';
             if (passwordRef.current) passwordRef.current.value = '';
         }

@@ -3,6 +3,7 @@ import { Navigation } from './Navigation';
 import { UsersManagement } from './UsersManagement';
 import { ApplicationsManagement } from './ApplicationsManagement';
 import { ApplicationFileManager } from './ApplicationFileManager';
+import { ProtectedRoute } from './ProtectedRoute';
 
 export function Dashboard() {
     return (
@@ -11,7 +12,11 @@ export function Dashboard() {
             <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                 <Routes>
                     <Route path="/" element={<DashboardHome />} />
-                    <Route path="/users" element={<UsersManagement />} />
+                    <Route path="/users" element={
+                        <ProtectedRoute requiredRole="admin">
+                            <UsersManagement />
+                        </ProtectedRoute>
+                    } />
                     <Route path="/applications" element={<ApplicationsManagement />} />
                     <Route path="/applications/:id/files" element={<ApplicationFileManager />} />
                 </Routes>

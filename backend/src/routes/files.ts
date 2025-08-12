@@ -6,7 +6,7 @@ import { database } from '../database';
 import { verifyApiKey } from '../auth';
 import {
     generateUniqueFileName,
-    convertImageToSvg,
+    convertImageToWebp,
     deleteFile,
     getFileStats
 } from '../fileUtils';
@@ -27,10 +27,10 @@ export async function fileRoutes(fastify: FastifyInstance) {
             return;
         }
 
-        const maxSize = 10 * 1024 * 1024;
+        const maxSize = 1024 * 1024 * 1024;
         const buffer = await data.toBuffer();
         if (buffer.length > maxSize) {
-            reply.code(400).send({ error: 'File too large. Maximum size is 10MB' });
+            reply.code(400).send({ error: 'File too large. Maximum size is 1GB' });
             return;
         }
 
@@ -112,7 +112,7 @@ export async function fileRoutes(fastify: FastifyInstance) {
         }
     });
 
-    fastify.post('/files/:id/convert-to-svg', async (request, reply) => {
+    fastify.post('/files/:id/convert-to-webp', async (request, reply) => {
         const { id } = request.params as { id: string };
         const { application } = request;
 
@@ -126,34 +126,34 @@ export async function fileRoutes(fastify: FastifyInstance) {
             return;
         }
 
-        if (!file.file_type.startsWith('image/')) {
-            reply.code(400).send({ error: 'File must be an image' });
+        if (!file.file_type.startsWith('image/') || file.file_type === 'image/webp') {
+            reply.code(400).send({ error: 'File must be a non-WebP image' });
             return;
         }
 
-        const svgFileName = file.current_name.replace(/\.[^.]+$/, '.svg');
-        const svgPath = path.join(application.folder_path, svgFileName);
+        const webpFileName = file.current_name.replace(/\.[^.]+$/, '.webp');
+        const webpPath = path.join(application.folder_path, webpFileName);
 
         try {
-            await convertImageToSvg(file.file_path, svgPath);
+            await convertImageToWebp(file.file_path, webpPath);
 
-            const stats = await getFileStats(svgPath);
-            const svgFileId = uuidv4();
+            const stats = await getFileStats(webpPath);
+            const webpFileId = uuidv4();
 
             await database.run(
                 'INSERT INTO files (id, application_id, original_name, current_name, file_path, file_type, size) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                [svgFileId, application.id, file.original_name + ' (SVG)', svgFileName, svgPath, 'image/svg+xml', stats.size]
+                [webpFileId, application.id, file.original_name + ' (WebP)', webpFileName, webpPath, 'image/webp', stats.size]
             );
 
             reply.send({
-                id: svgFileId,
-                original_name: file.original_name + ' (SVG)',
-                current_name: svgFileName,
-                file_type: 'image/svg+xml',
+                id: webpFileId,
+                original_name: file.original_name + ' (WebP)',
+                current_name: webpFileName,
+                file_type: 'image/webp',
                 size: stats.size
             });
         } catch (error) {
-            reply.code(500).send({ error: 'Failed to convert image to SVG' });
+            reply.code(500).send({ error: 'Failed to convert image to WebP' });
         }
     });
 
