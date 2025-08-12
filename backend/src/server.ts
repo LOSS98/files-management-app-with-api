@@ -16,7 +16,7 @@ const fastify = Fastify({
 async function start() {
     await fastify.register(cors, {
         origin: process.env.NODE_ENV === 'production' 
-            ? ['http://localhost:3000', 'https://your-domain.com']
+            ? ['http://localhost:3002', 'https://your-domain.com']
             : true,
         credentials: true
     });
