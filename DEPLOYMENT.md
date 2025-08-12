@@ -62,7 +62,7 @@ docker-compose ps
 docker-compose logs -f
 ```
 
-### Étape 3: Configuration Nginx
+### Étape 3: Configuration Nginx (HTTP seulement)
 
 ```bash
 # Installation de Nginx
@@ -75,39 +75,11 @@ sudo rm /etc/nginx/sites-enabled/default
 sudo nano /etc/nginx/sites-available/file-manager
 ```
 
-**Configuration Nginx (`/etc/nginx/sites-available/file-manager`):**
+**Configuration Nginx HTTP (`/etc/nginx/sites-available/file-manager`):**
 ```nginx
-# Redirection HTTP vers HTTPS
 server {
     listen 80;
     server_name your-domain.com www.your-domain.com;
-    
-    # Autoriser la validation Certbot
-    location /.well-known/acme-challenge/ {
-        root /var/www/html;
-    }
-    
-    # Rediriger le reste vers HTTPS
-    location / {
-        return 301 https://$server_name$request_uri;
-    }
-}
-
-# Serveur HTTPS
-server {
-    listen 443 ssl http2;
-    server_name your-domain.com www.your-domain.com;
-    
-    # Configuration SSL (sera gérée par Certbot)
-    ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
-    
-    # Sécurité SSL moderne
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512;
-    ssl_prefer_server_ciphers off;
-    ssl_session_cache shared:SSL:10m;
-    ssl_session_timeout 10m;
     
     # En-têtes de sécurité
     add_header X-Frame-Options "SAMEORIGIN" always;
@@ -115,7 +87,6 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header Referrer-Policy "no-referrer-when-downgrade" always;
     add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline'" always;
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
     
     # Compression Gzip
     gzip on;
@@ -185,6 +156,8 @@ server {
 }
 ```
 
+**⚠️ Note importante:** Cette configuration est pour HTTP seulement. Certbot modifiera automatiquement cette configuration pour ajouter HTTPS et la redirection.
+
 **Activation de la configuration:**
 ```bash
 # Activer le site
@@ -214,7 +187,9 @@ nslookup your-domain.com
 curl -I http://your-domain.com
 ```
 
-### Étape 5: Certificat SSL avec Certbot
+**⚠️ Important:** Attendez que le DNS soit propagé avant de passer à l'étape suivante.
+
+### Étape 5: Certificat SSL avec Certbot (Configuration automatique)
 
 ```bash
 # Installation de Certbot
@@ -224,7 +199,7 @@ sudo snap install --classic certbot
 # Création du lien symbolique
 sudo ln -s /snap/bin/certbot /usr/bin/certbot
 
-# Obtention du certificat SSL (remplacez par votre domaine)
+# Obtention du certificat SSL et configuration automatique de Nginx
 sudo certbot --nginx -d your-domain.com -d www.your-domain.com
 ```
 
@@ -232,7 +207,11 @@ sudo certbot --nginx -d your-domain.com -d www.your-domain.com
 - Entrez votre adresse email pour les notifications de renouvellement
 - Acceptez les conditions d'utilisation
 - Choisissez si vous voulez partager votre email avec l'EFF
-- Certbot configurera automatiquement Nginx
+- **Certbot va automatiquement:**
+  - Générer les certificats SSL
+  - Modifier votre configuration Nginx
+  - Ajouter la redirection HTTP → HTTPS
+  - Configurer les en-têtes SSL
 
 **Test du renouvellement automatique:**
 ```bash
@@ -241,6 +220,35 @@ sudo certbot renew --dry-run
 
 # Vérification des certificats
 sudo certbot certificates
+```
+
+**Après Certbot, votre configuration Nginx ressemblera à ceci:**
+```nginx
+server {
+    server_name your-domain.com www.your-domain.com;
+    
+    # Votre configuration existante...
+    
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+server {
+    if ($host = www.your-domain.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    if ($host = your-domain.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    listen 80;
+    server_name your-domain.com www.your-domain.com;
+    return 404; # managed by Certbot
+}
 ```
 
 ### Étape 6: Configuration du pare-feu
@@ -272,7 +280,7 @@ sudo ufw status verbose
 sudo systemctl status nginx
 docker-compose ps
 
-# Tester l'application
+# Tester l'application en HTTPS
 curl -I https://your-domain.com
 
 # Vérifier les logs
@@ -281,7 +289,7 @@ sudo tail -f /var/log/nginx/access.log
 ```
 
 **Accès à votre application:**
-- **URL**: https://your-domain.com
+- **URL**: https://your-domain.com (redirectionné automatiquement)
 - **Connexion admin**: `admin` / `VotreMotDePasseSecurise123!`
 
 ## 🔧 Maintenance et Surveillance
@@ -374,14 +382,15 @@ docker-compose up -d --build
 docker-compose ps
 ```
 
-### Renouvellement SSL
+### Renouvellement SSL (Automatique)
 
 ```bash
-# Renouvellement automatique (configuré par cron)
-sudo certbot renew
-
+# Le renouvellement est automatique via cron
 # Vérification manuelle de l'expiration
 sudo certbot certificates
+
+# Test manuel du renouvellement
+sudo certbot renew --dry-run
 ```
 
 ## 🚨 Dépannage
@@ -410,6 +419,9 @@ sudo certbot renew --force-renewal
 
 # Tester la configuration Nginx
 sudo nginx -t
+
+# Redémarrer Nginx
+sudo systemctl restart nginx
 ```
 
 **Problèmes de performance:**
@@ -423,6 +435,16 @@ sudo tail -f /var/log/nginx/error.log
 docker-compose logs --tail=100
 ```
 
+**Problèmes DNS:**
+```bash
+# Vérifier la propagation DNS
+nslookup your-domain.com
+dig your-domain.com
+
+# Tester la connectivité
+ping your-domain.com
+```
+
 Votre application File Manager est maintenant déployée en production de manière sécurisée! 🎉
 
 ---
@@ -430,8 +452,14 @@ Votre application File Manager est maintenant déployée en production de maniè
 **Récapitulatif des étapes:**
 1. ✅ Préparation serveur + Docker
 2. ✅ Déploiement application avec Docker Compose  
-3. ✅ Configuration Nginx reverse proxy
+3. ✅ Configuration Nginx HTTP simple
 4. ✅ Configuration DNS domaine
-5. ✅ Installation certificat SSL avec Certbot
+5. ✅ Certbot configure automatiquement HTTPS + redirection
 6. ✅ Configuration pare-feu UFW
 7. ✅ Surveillance et sauvegarde automatiques
+
+**Avantages de cette méthode:**
+- 🚀 **Simple**: Configuration Nginx HTTP d'abord
+- 🔒 **Automatique**: Certbot gère tout le SSL
+- ⚡ **Rapide**: Moins d'étapes manuelles  
+- 🛡️ **Sécurisé**: Configuration SSL optimale par Certbot

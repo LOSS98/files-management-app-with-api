@@ -306,8 +306,21 @@ server {
     listen 80;
     server_name your-domain.com www.your-domain.com;
     
-    # Redirect HTTP to HTTPS
-    return 301 https://$server_name$request_uri;
+    # Configuration HTTP simple - Certbot ajoutera HTTPS automatiquement
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+    
+    location /api {
+        proxy_pass http://localhost:3001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        client_max_body_size 1G;
+    }
 }
 ```
 
