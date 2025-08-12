@@ -1,100 +1,100 @@
 # 🚀 Production Deployment Guide
 
-Guide simple et efficace pour déployer File Manager en production avec Docker, Nginx et SSL automatique.
+Simple and effective guide to deploy File Manager in production with Docker, Nginx and automatic SSL.
 
-## 📋 Prérequis
+## 📋 Prerequisites
 
-- **Serveur**: Ubuntu 20.04+ avec accès root
-- **Domaine**: Nom de domaine pointé vers votre serveur
-- **Ressources**: Minimum 2GB RAM, 20GB stockage
-- **Ports ouverts**: 22 (SSH), 80 (HTTP), 443 (HTTPS)
+- **Server**: Ubuntu 20.04+ with root access
+- **Domain**: Domain name pointed to your server
+- **Resources**: Minimum 2GB RAM, 20GB storage
+- **Open ports**: 22 (SSH), 80 (HTTP), 443 (HTTPS)
 
-## 🐳 Méthode Docker (Recommandée)
+## 🐳 Docker Method (Recommended)
 
-### Étape 1: Préparation du serveur
+### Step 1: Server Preparation
 
 ```bash
-# Mise à jour du système
+# Update system
 sudo apt update && sudo apt upgrade -y
 
-# Installation des outils essentiels
+# Install essential tools
 sudo apt install -y curl wget git
 
-# Installation de Docker
+# Install Docker
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 sudo usermod -aG docker $USER
 
-# Installation de Docker Compose
+# Install Docker Compose
 sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 
-# Redémarrage pour appliquer les permissions
+# Reboot to apply permissions
 sudo reboot
 ```
 
-### Étape 2: Déploiement de l'application
+### Step 2: Application Deployment
 
 ```bash
-# Clonage du repository
+# Clone repository
 git clone https://github.com/LOSS98/files-management-app-with-api.git
 cd files-management-app-with-api
 
-# Configuration de l'environnement
+# Configure environment
 cp .env.example .env
 nano .env
 ```
 
-**Configuration .env:**
+**Environment Configuration (.env):**
 ```env
 NODE_ENV=production
 JWT_SECRET=your-super-secure-256-bit-secret-key-change-this-now
 ADMIN_PASSWORD=YourSecureAdminPassword123!
 ```
 
-**Démarrage avec Docker:**
+**Start with Docker:**
 ```bash
-# Construction et démarrage des conteneurs
+# Build and start containers
 docker-compose up -d --build
 
-# Vérification du statut
+# Check status
 docker-compose ps
 docker-compose logs -f
 ```
 
-### Étape 3: Configuration Nginx (HTTP seulement)
+### Step 3: Nginx Configuration (HTTP only)
 
 ```bash
-# Installation de Nginx
+# Install Nginx
 sudo apt install nginx -y
 
-# Suppression de la configuration par défaut
+# Remove default configuration
 sudo rm /etc/nginx/sites-enabled/default
 
-# Création de la configuration File Manager
+# Create File Manager configuration
 sudo nano /etc/nginx/sites-available/file-manager
 ```
 
-**Configuration Nginx HTTP (`/etc/nginx/sites-available/file-manager`):**
+**Nginx HTTP Configuration (`/etc/nginx/sites-available/file-manager`):**
 ```nginx
 server {
     listen 80;
     server_name your-domain.com www.your-domain.com;
     
-    # En-têtes de sécurité
+    # Security headers
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header Referrer-Policy "no-referrer-when-downgrade" always;
     add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline'" always;
     
-    # Compression Gzip
+    # Gzip compression
     gzip on;
     gzip_vary on;
     gzip_min_length 1024;
     gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
     
-    # Frontend - Application React
+    # Frontend - React Application
     location / {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
@@ -119,16 +119,16 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_cache_bypass $http_upgrade;
         
-        # Timeout pour les gros fichiers
+        # Timeouts for large files
         proxy_connect_timeout 60s;
         proxy_send_timeout 60s;
         proxy_read_timeout 60s;
         
-        # Limite de taille des fichiers (1GB)
+        # File size limit (1GB)
         client_max_body_size 1G;
     }
     
-    # Fichiers statiques et téléchargements
+    # Static files and downloads
     location /uploads {
         proxy_pass http://localhost:3001;
         proxy_set_header Host $host;
@@ -136,12 +136,12 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         
-        # Support des gros fichiers
+        # Large file support
         client_max_body_size 1G;
         proxy_request_buffering off;
     }
     
-    # Sécurité - Bloquer l'accès aux fichiers sensibles
+    # Security - Block access to sensitive files
     location ~ /\. {
         deny all;
         access_log off;
@@ -156,78 +156,78 @@ server {
 }
 ```
 
-**⚠️ Note importante:** Cette configuration est pour HTTP seulement. Certbot modifiera automatiquement cette configuration pour ajouter HTTPS et la redirection.
+**⚠️ Important Note:** This configuration is HTTP only. Certbot will automatically modify this configuration to add HTTPS and redirection.
 
-**Activation de la configuration:**
+**Enable configuration:**
 ```bash
-# Activer le site
+# Enable site
 sudo ln -s /etc/nginx/sites-available/file-manager /etc/nginx/sites-enabled/
 
-# Tester la configuration
+# Test configuration
 sudo nginx -t
 
-# Démarrer Nginx
+# Start Nginx
 sudo systemctl start nginx
 sudo systemctl enable nginx
 ```
 
-### Étape 4: Configuration DNS
+### Step 4: DNS Configuration
 
-**Configurez les enregistrements DNS de votre domaine:**
+**Configure your domain's DNS records:**
 
-1. **Enregistrement A**: `your-domain.com` → `IP-de-votre-serveur`
-2. **Enregistrement CNAME**: `www.your-domain.com` → `your-domain.com`
+1. **A Record**: `your-domain.com` → `your-server-ip`
+2. **CNAME Record**: `www.your-domain.com` → `your-domain.com`
 
-**Vérification de la propagation DNS:**
+**Verify DNS propagation:**
 ```bash
-# Vérifier l'enregistrement A
+# Check A record
 nslookup your-domain.com
 
-# Tester la connexion HTTP
+# Test HTTP connection
 curl -I http://your-domain.com
 ```
 
-**⚠️ Important:** Attendez que le DNS soit propagé avant de passer à l'étape suivante.
+**⚠️ Important:** Wait for DNS propagation before proceeding to the next step.
 
-### Étape 5: Certificat SSL avec Certbot (Configuration automatique)
+### Step 5: SSL Certificate with Certbot (Automatic configuration)
 
 ```bash
-# Installation de Certbot
+# Install Certbot
 sudo apt install snapd -y
 sudo snap install --classic certbot
 
-# Création du lien symbolique
+# Create symbolic link
 sudo ln -s /snap/bin/certbot /usr/bin/certbot
 
-# Obtention du certificat SSL et configuration automatique de Nginx
+# Obtain SSL certificate and automatically configure Nginx
 sudo certbot --nginx -d your-domain.com -d www.your-domain.com
 ```
 
-**Suivez les invites interactives:**
-- Entrez votre adresse email pour les notifications de renouvellement
-- Acceptez les conditions d'utilisation
-- Choisissez si vous voulez partager votre email avec l'EFF
-- **Certbot va automatiquement:**
-  - Générer les certificats SSL
-  - Modifier votre configuration Nginx
-  - Ajouter la redirection HTTP → HTTPS
-  - Configurer les en-têtes SSL
+**Follow the interactive prompts:**
+- Enter your email address for renewal notifications
+- Accept the terms of service
+- Choose whether to share your email with EFF
+- **Certbot will automatically:**
+  - Generate SSL certificates
+  - Modify your Nginx configuration
+  - Add HTTP → HTTPS redirection
+  - Configure SSL headers
 
-**Test du renouvellement automatique:**
+**Test automatic renewal:**
 ```bash
-# Test de renouvellement
+# Test renewal
 sudo certbot renew --dry-run
 
-# Vérification des certificats
+# Check certificates
 sudo certbot certificates
 ```
 
-**Après Certbot, votre configuration Nginx ressemblera à ceci:**
+**After Certbot, your Nginx configuration will look like this:**
 ```nginx
 server {
     server_name your-domain.com www.your-domain.com;
     
-    # Votre configuration existante...
+    # Your existing configuration...
     
     listen 443 ssl; # managed by Certbot
     ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem; # managed by Certbot
@@ -251,215 +251,215 @@ server {
 }
 ```
 
-### Étape 6: Configuration du pare-feu
+### Step 6: Firewall Configuration
 
 ```bash
-# Configuration UFW
+# Configure UFW
 sudo ufw --force reset
 
-# Politiques par défaut
+# Default policies
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 
-# Autoriser SSH, HTTP et HTTPS
+# Allow SSH, HTTP and HTTPS
 sudo ufw allow 22/tcp
 sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
 
-# Activer le pare-feu
+# Enable firewall
 sudo ufw --force enable
 
-# Vérifier le statut
+# Check status
 sudo ufw status verbose
 ```
 
-### Étape 7: Vérification du déploiement
+### Step 7: Deployment Verification
 
 ```bash
-# Vérifier les services
+# Check services
 sudo systemctl status nginx
 docker-compose ps
 
-# Tester l'application en HTTPS
+# Test application with HTTPS
 curl -I https://your-domain.com
 
-# Vérifier les logs
+# Check logs
 docker-compose logs -f
 sudo tail -f /var/log/nginx/access.log
 ```
 
-**Accès à votre application:**
-- **URL**: https://your-domain.com (redirectionné automatiquement)
-- **Connexion admin**: `admin` / `VotreMotDePasseSecurise123!`
+**Access your application:**
+- **URL**: https://your-domain.com (automatically redirected)
+- **Admin login**: `admin` / `YourSecurePassword123!`
 
-## 🔧 Maintenance et Surveillance
+## 🔧 Maintenance and Monitoring
 
-### Surveillance automatique
+### Automatic monitoring
 
-**Script de surveillance (`/usr/local/bin/file-manager-health.sh`):**
+**Monitoring script (`/usr/local/bin/file-manager-health.sh`):**
 ```bash
 #!/bin/bash
-# Script de surveillance File Manager
+# File Manager monitoring script
 
 cd /path/to/files-management-app-with-api
 
-# Vérifier les conteneurs Docker
+# Check Docker containers
 if ! docker-compose ps | grep -q "Up"; then
-    echo "Conteneurs Docker arrêtés, redémarrage..."
+    echo "Docker containers stopped, restarting..."
     docker-compose restart
 fi
 
-# Vérifier Nginx
+# Check Nginx
 if ! systemctl is-active --quiet nginx; then
-    echo "Nginx arrêté, redémarrage..."
+    echo "Nginx stopped, restarting..."
     systemctl restart nginx
 fi
 ```
 
 ```bash
-# Rendre exécutable
+# Make executable
 sudo chmod +x /usr/local/bin/file-manager-health.sh
 
-# Ajouter au crontab (vérification toutes les 5 minutes)
+# Add to crontab (check every 5 minutes)
 sudo crontab -e
 */5 * * * * /usr/local/bin/file-manager-health.sh
 ```
 
-### Sauvegarde automatique
+### Automatic backup
 
-**Script de sauvegarde (`/usr/local/bin/file-manager-backup.sh`):**
+**Backup script (`/usr/local/bin/file-manager-backup.sh`):**
 ```bash
 #!/bin/bash
-# Script de sauvegarde File Manager
+# File Manager backup script
 
 BACKUP_DIR="/backup/file-manager"
 DATE=$(date +%Y%m%d_%H%M%S)
 APP_DIR="/path/to/files-management-app-with-api"
 
-# Créer le répertoire de sauvegarde
+# Create backup directory
 mkdir -p $BACKUP_DIR
 
-# Sauvegarder la base de données
+# Backup database
 docker-compose exec -T backend cat /app/data/database.sqlite > $BACKUP_DIR/database_$DATE.sqlite
 
-# Sauvegarder les fichiers uploadés
+# Backup uploaded files
 tar -czf $BACKUP_DIR/uploads_$DATE.tar.gz -C $APP_DIR uploads/
 
-# Sauvegarder la configuration
+# Backup configuration
 cp $APP_DIR/.env $BACKUP_DIR/env_$DATE.backup
 
-# Supprimer les sauvegardes de plus de 30 jours
+# Remove backups older than 30 days
 find $BACKUP_DIR -name "*" -type f -mtime +30 -delete
 
-echo "Sauvegarde terminée: $DATE"
+echo "Backup completed: $DATE"
 ```
 
 ```bash
-# Rendre exécutable
+# Make executable
 sudo chmod +x /usr/local/bin/file-manager-backup.sh
 
-# Ajouter au crontab (sauvegarde quotidienne à 2h du matin)
+# Add to crontab (daily backup at 2 AM)
 sudo crontab -e
 0 2 * * * /usr/local/bin/file-manager-backup.sh
 ```
 
-## 🔄 Mises à jour
+## 🔄 Updates
 
-### Mise à jour de l'application
+### Application update
 
 ```bash
-# Aller dans le répertoire
+# Go to directory
 cd /path/to/files-management-app-with-api
 
-# Récupérer les dernières modifications
+# Pull latest changes
 git pull origin main
 
-# Reconstruire et redémarrer les conteneurs
+# Rebuild and restart containers
 docker-compose down
 docker-compose up -d --build
 
-# Vérifier le statut
+# Check status
 docker-compose ps
 ```
 
-### Renouvellement SSL (Automatique)
+### SSL Renewal (Automatic)
 
 ```bash
-# Le renouvellement est automatique via cron
-# Vérification manuelle de l'expiration
+# Renewal is automatic via cron
+# Manual expiration check
 sudo certbot certificates
 
-# Test manuel du renouvellement
+# Manual renewal test
 sudo certbot renew --dry-run
 ```
 
-## 🚨 Dépannage
+## 🚨 Troubleshooting
 
-### Problèmes courants
+### Common issues
 
-**Les conteneurs ne démarrent pas:**
+**Containers won't start:**
 ```bash
-# Vérifier les logs
+# Check logs
 docker-compose logs
 
-# Vérifier l'espace disque
+# Check disk space
 df -h
 
-# Vérifier la configuration
+# Check configuration
 docker-compose config
 ```
 
-**Problèmes SSL:**
+**SSL issues:**
 ```bash
-# Vérifier le statut des certificats
+# Check certificate status
 sudo certbot certificates
 
-# Renouveler le certificat
+# Renew certificate
 sudo certbot renew --force-renewal
 
-# Tester la configuration Nginx
+# Test Nginx configuration
 sudo nginx -t
 
-# Redémarrer Nginx
+# Restart Nginx
 sudo systemctl restart nginx
 ```
 
-**Problèmes de performance:**
+**Performance issues:**
 ```bash
-# Surveiller les ressources
+# Monitor resources
 htop
 docker stats
 
-# Vérifier les logs d'erreur
+# Check error logs
 sudo tail -f /var/log/nginx/error.log
 docker-compose logs --tail=100
 ```
 
-**Problèmes DNS:**
+**DNS issues:**
 ```bash
-# Vérifier la propagation DNS
+# Check DNS propagation
 nslookup your-domain.com
 dig your-domain.com
 
-# Tester la connectivité
+# Test connectivity
 ping your-domain.com
 ```
 
-Votre application File Manager est maintenant déployée en production de manière sécurisée! 🎉
+Your File Manager application is now securely deployed in production! 🎉
 
 ---
 
-**Récapitulatif des étapes:**
-1. ✅ Préparation serveur + Docker
-2. ✅ Déploiement application avec Docker Compose  
-3. ✅ Configuration Nginx HTTP simple
-4. ✅ Configuration DNS domaine
-5. ✅ Certbot configure automatiquement HTTPS + redirection
-6. ✅ Configuration pare-feu UFW
-7. ✅ Surveillance et sauvegarde automatiques
+**Steps Summary:**
+1. ✅ Server preparation + Docker
+2. ✅ Application deployment with Docker Compose  
+3. ✅ Simple Nginx HTTP configuration
+4. ✅ Domain DNS configuration
+5. ✅ Certbot automatically configures HTTPS + redirection
+6. ✅ UFW firewall configuration
+7. ✅ Automatic monitoring and backup
 
-**Avantages de cette méthode:**
-- 🚀 **Simple**: Configuration Nginx HTTP d'abord
-- 🔒 **Automatique**: Certbot gère tout le SSL
-- ⚡ **Rapide**: Moins d'étapes manuelles  
-- 🛡️ **Sécurisé**: Configuration SSL optimale par Certbot
+**Advantages of this method:**
+- 🚀 **Simple**: HTTP Nginx configuration first
+- 🔒 **Automatic**: Certbot handles all SSL
+- ⚡ **Fast**: Fewer manual steps  
+- 🛡️ **Secure**: Optimal SSL configuration by Certbot

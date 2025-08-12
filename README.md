@@ -48,7 +48,7 @@ npm run dev
 - **API Server**: http://localhost:3001  
 - **Default Login**: `admin` / `admin123`
 
-## 🐳 Docker Deployment (Recommandé)
+## 🐳 Docker Deployment (Recommended)
 
 ```bash
 # Start with Docker Compose
@@ -59,7 +59,7 @@ docker-compose ps
 docker-compose logs -f
 ```
 
-**Pour un déploiement en production complet avec SSL:** Voir [DEPLOYMENT.md](DEPLOYMENT.md)
+**For complete production deployment with SSL:** See [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ## 📖 API Documentation
 
@@ -306,7 +306,7 @@ server {
     listen 80;
     server_name your-domain.com www.your-domain.com;
     
-    # Configuration HTTP simple - Certbot ajoutera HTTPS automatiquement
+    # Simple HTTP configuration - Certbot will add HTTPS automatically
     location / {
         proxy_pass http://localhost:3000;
         proxy_set_header Host $host;
