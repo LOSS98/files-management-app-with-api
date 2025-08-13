@@ -12,3 +12,6 @@ uploads/
 .DS_Store
 .vscode/
 .idea/
+backend/package-lock.json
+frontend/package-lock.json
+package-lock.json
