@@ -6,17 +6,18 @@ RUN apk add --no-cache \
     make \
     g++ \
     sqlite \
-    vips-dev
+    vips-dev \
+    pkgconfig
 
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies and rebuild native modules
-RUN npm install && \
+# Install dependencies with specific Sharp configuration for Alpine
+RUN npm install --platform=linuxmusl --arch=x64 && \
     npm rebuild better-sqlite3 --build-from-source && \
-    npm rebuild sharp --platform=linuxmusl
+    npm install --platform=linuxmusl --arch=x64 --ignore-scripts=false --foreground-scripts --verbose sharp
 
 # Install TypeScript globally
 RUN npm install -g typescript
