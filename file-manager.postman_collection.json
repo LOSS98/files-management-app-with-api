@@ -1,0 +1,1520 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-5e6f-7890-abcd-ef1234567890",
+		"name": "File Manager API",
+		"description": "Complete API collection for File Manager - a modern, secure file management system with multi-application support. Built with TypeScript, featuring Fastify backend and React frontend.\n\n🔗 **Repository**: https://github.com/your-username/file-manager\n📖 **Documentation**: Full API documentation in README.md\n🔒 **Security**: JWT + API Key authentication with comprehensive validation\n\n## Quick Setup\n1. Start the application: `npm run dev`\n2. Import this collection\n3. Set environment variable `base_url` to `http://localhost:3001`\n4. Run \"Admin Login\" to get JWT token\n5. Create an application to get API key\n\n## Authentication\n- **Admin Routes**: JWT token (auto-saved after login)\n- **File Routes**: API key (auto-saved after app creation)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "file-manager-v1"
+	},
+	"item": [
+		{
+			"name": "🔐 Authentication",
+			"item": [
+				{
+					"name": "Admin Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('jwt_token', response.token);",
+									"    pm.environment.set('admin_user_id', response.user.id);",
+									"    pm.environment.set('admin_username', response.user.username);",
+									"    console.log('✅ JWT Token saved to environment');",
+									"    console.log('👤 Logged in as:', response.user.username);",
+									"} else {",
+									"    console.log('❌ Login failed');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "🔑 **Admin Authentication**\n\nLogin with admin credentials to access the management panel.\n\n**Default Credentials:**\n- Username: `admin`\n- Password: `admin123`\n\n**Success Response:**\n- JWT token (auto-saved to environment)\n- User information\n\n**Security Features:**\n- Bcrypt password hashing\n- JWT with configurable secret\n- Role-based access control"
+					},
+					"response": [
+						{
+							"name": "✅ Successful Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJhZG1pbi11dWlkIiwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTYzOTQ4NDgwMCwiZXhwIjoxNjM5NTcxMjAwfQ.signature\",\n  \"user\": {\n    \"id\": \"admin-uuid-here\",\n    \"username\": \"admin\",\n    \"role\": \"admin\"\n  }\n}"
+						},
+						{
+							"name": "❌ Invalid Credentials",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"username\": \"wrong\",\n  \"password\": \"credentials\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/auth/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": \"Invalid credentials\"\n}"
+						}
+					]
+				}
+			],
+			"description": "🔐 **Authentication System**\n\nSecure JWT-based authentication for admin access with comprehensive security features."
+		},
+		{
+			"name": "👥 User Management",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users"
+							]
+						},
+						"description": "📋 **List All Users**\n\nRetrieve all users in the system with their roles and creation dates.\n\n**Authentication:** Admin JWT token required\n\n**Response Features:**\n- User ID, username, role\n- Creation timestamp (French format: dd/mm/yyyy)\n- Password excluded for security\n\n**Use Cases:**\n- Admin dashboard user list\n- User management interface\n- System auditing"
+					},
+					"response": [
+						{
+							"name": "✅ Users Retrieved",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/users",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"users"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"users\": [\n    {\n      \"id\": \"admin-uuid-1\",\n      \"username\": \"admin\",\n      \"role\": \"admin\",\n      \"created_at\": \"2024-01-15T10:30:00.000Z\"\n    },\n    {\n      \"id\": \"user-uuid-2\",\n      \"username\": \"johndoe\",\n      \"role\": \"user\",\n      \"created_at\": \"2024-01-16T14:22:00.000Z\"\n    }\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Create User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('created_user_id', response.id);",
+									"    console.log('✅ User created:', response.username);",
+									"    console.log('🆔 User ID saved to environment');",
+									"} else {",
+									"    console.log('❌ User creation failed');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"newuser\",\n  \"password\": \"securepass123\",\n  \"role\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users"
+							]
+						},
+						"description": "➕ **Create New User**\n\nAdd a new user to the system with specified role and credentials.\n\n**Authentication:** Admin JWT token required\n\n**Validation Rules:**\n- Username: Required, must be unique\n- Password: Minimum 8 characters\n- Role: Must be \"admin\" or \"user\"\n\n**Security Features:**\n- Password hashing with bcrypt (12 rounds)\n- Input sanitization\n- Duplicate username prevention\n\n**Available Roles:**\n- `admin`: Full system access\n- `user`: Standard user permissions"
+					},
+					"response": [
+						{
+							"name": "✅ User Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"username\": \"newuser\",\n  \"password\": \"securepass123\",\n  \"role\": \"user\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/users",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"users"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"new-user-uuid\",\n  \"username\": \"newuser\",\n  \"role\": \"user\"\n}"
+						},
+						{
+							"name": "❌ Validation Error",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"123\",\n  \"role\": \"invalid\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/users",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"users"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": \"Password must be at least 8 characters long\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/users/{{created_user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users",
+								"{{created_user_id}}"
+							]
+						},
+						"description": "🗑️ **Delete User**\n\nRemove a user from the system permanently.\n\n**Authentication:** Admin JWT token required\n\n**Parameters:**\n- `id`: User UUID from user creation or user list\n\n**Security Considerations:**\n- Only admins can delete users\n- Permanent action - cannot be undone\n- Consider data retention policies\n\n**Use Cases:**\n- Remove inactive accounts\n- Clean up test users\n- Security incident response"
+					},
+					"response": [
+						{
+							"name": "✅ User Deleted",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/users/user-uuid-to-delete",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"users",
+										"user-uuid-to-delete"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"success\": true\n}"
+						}
+					]
+				}
+			],
+			"description": "👥 **User Management System**\n\nComprehensive user administration with role-based access control and security validation."
+		},
+		{
+			"name": "🚀 Application Management",
+			"item": [
+				{
+					"name": "Get All Applications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/applications",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"applications"
+							]
+						},
+						"description": "📋 **List Applications**\n\nRetrieve all registered applications with their API keys and metadata.\n\n**Authentication:** Admin JWT token required\n\n**Response Data:**\n- Application ID and name\n- API key for file operations\n- Folder path for file storage\n- Creation timestamp\n\n**Security Notes:**\n- API keys are sensitive - handle carefully\n- Each application has isolated file storage\n- Keys can be regenerated if compromised"
+					},
+					"response": [
+						{
+							"name": "✅ Applications Retrieved",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/applications",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"applications"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"applications\": [\n    {\n      \"id\": \"app-uuid-1\",\n      \"name\": \"MyWebApp\",\n      \"api_key\": \"app_1234567890abcdef1234567890abcdef\",\n      \"folder_path\": \"./uploads/MyWebApp\",\n      \"created_at\": \"2024-01-15T10:30:00.000Z\"\n    },\n    {\n      \"id\": \"app-uuid-2\",\n      \"name\": \"MobileApp\",\n      \"api_key\": \"app_abcdef1234567890abcdef1234567890\",\n      \"folder_path\": \"./uploads/MobileApp\",\n      \"created_at\": \"2024-01-16T14:22:00.000Z\"\n    }\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Create Application",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('app_id', response.id);",
+									"    pm.environment.set('api_key', response.api_key);",
+									"    pm.environment.set('app_name', response.name);",
+									"    console.log('✅ Application created:', response.name);",
+									"    console.log('🔑 API Key saved to environment');",
+									"    console.log('📁 Folder path:', response.folder_path);",
+									"} else {",
+									"    console.log('❌ Application creation failed');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"MyNewApp\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/applications",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"applications"
+							]
+						},
+						"description": "➕ **Create Application**\n\nRegister a new application and generate its API key for file operations.\n\n**Authentication:** Admin JWT token required\n\n**Process:**\n1. Creates unique application record\n2. Generates secure API key (format: app_32hexchars)\n3. Creates dedicated folder for file storage\n4. Returns API key for file operations\n\n**API Key Features:**\n- 32-character hexadecimal identifier\n- Unique per application\n- Required for all file operations\n- Can be regenerated if needed\n\n**Folder Structure:**\n- `./uploads/{ApplicationName}/`\n- Isolated storage per application"
+					},
+					"response": [
+						{
+							"name": "✅ Application Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"MyNewApp\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/applications",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"applications"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"new-app-uuid\",\n  \"name\": \"MyNewApp\",\n  \"api_key\": \"app_abcdef1234567890abcdef1234567890\",\n  \"folder_path\": \"./uploads/MyNewApp\"\n}"
+						},
+						{
+							"name": "❌ Duplicate Name",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"ExistingApp\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/admin/applications",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"applications"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": \"Application name already exists\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Regenerate API Key",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('api_key', response.api_key);",
+									"    console.log('✅ API Key regenerated');",
+									"    console.log('🆕 New API key saved to environment');",
+									"    console.log('⚠️  Old API key is now invalid');",
+									"} else {",
+									"    console.log('❌ API key regeneration failed');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/applications/{{app_id}}/regenerate-key",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"applications",
+								"{{app_id}}",
+								"regenerate-key"
+							]
+						},
+						"description": "🔄 **Regenerate API Key**\n\nGenerate a new API key for an application, invalidating the old one.\n\n**Authentication:** Admin JWT token required\n\n**Security Considerations:**\n- Old API key becomes invalid immediately\n- All existing file operations with old key will fail\n- Update client applications with new key\n- Use for security incidents or key rotation\n\n**When to Regenerate:**\n- Security breach or suspected compromise\n- Regular key rotation policy\n- Employee access changes\n- API key accidentally exposed\n\n**Impact:**\n- Existing file operations continue working\n- Client applications need key update"
+					},
+					"response": [
+						{
+							"name": "✅ API Key Regenerated",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/applications/app-uuid/regenerate-key",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"applications",
+										"app-uuid",
+										"regenerate-key"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"api_key\": \"app_newfreshkey1234567890abcdef1234\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Application",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/admin/applications/{{app_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"applications",
+								"{{app_id}}"
+							]
+						},
+						"description": "🗑️ **Delete Application**\n\nCompletely remove an application and all its associated files.\n\n**Authentication:** Admin JWT token required\n\n**⚠️ DESTRUCTIVE OPERATION:**\n- Deletes application record\n- Removes ALL associated files\n- Invalidates API key permanently\n- Cannot be undone\n\n**Data Removed:**\n- Application metadata\n- All uploaded files\n- File database records\n- Storage folder contents\n\n**Use Cases:**\n- Application decommissioning\n- Clean up test applications\n- Security incident response"
+					},
+					"response": [
+						{
+							"name": "✅ Application Deleted",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{jwt_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/admin/applications/app-uuid",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"applications",
+										"app-uuid"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"success\": true\n}"
+						}
+					]
+				}
+			],
+			"description": "🚀 **Application Management**\n\nComplete application lifecycle management with secure API key generation and isolated file storage."
+		},
+		{
+			"name": "📁 File Operations",
+			"item": [
+				{
+					"name": "Upload File",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('file_id', response.id);",
+									"    pm.environment.set('file_name', response.current_name);",
+									"    pm.environment.set('file_type', response.file_type);",
+									"    console.log('✅ File uploaded:', response.original_name);",
+									"    console.log('📄 File ID saved to environment');",
+									"    console.log('📊 Size:', Math.round(response.size / 1024) + ' KB');",
+									"    console.log('🎯 Type:', response.file_type);",
+									"} else {",
+									"    console.log('❌ File upload failed');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-API-Key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": [],
+									"description": "Select a file to upload (Images, PDFs, or text files up to 10MB)"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/files/upload",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"files",
+								"upload"
+							]
+						},
+						"description": "📤 **Upload File**\n\nUpload files with comprehensive security validation and processing.\n\n**Authentication:** API Key required (`X-API-Key` header)\n\n**📋 File Restrictions:**\n- **Allowed Types**: JPEG, PNG, GIF, WebP, PDF, Plain Text\n- **Max Size**: 10MB per file\n- **Security**: Filename sanitization, type validation\n\n**🔒 Security Features:**\n- MIME type validation\n- File size limits\n- Filename sanitization\n- UUID-based unique naming\n- Isolated storage per application\n\n**📁 Storage:**\n- Original filename preserved in metadata\n- Unique filename generated for storage\n- Organized by application folder\n\n**🎯 Use Cases:**\n- Document management\n- Image galleries\n- File sharing systems\n- Content management"
+					},
+					"response": [
+						{
+							"name": "✅ File Uploaded Successfully",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-API-Key",
+										"value": "{{api_key}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": []
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/api/files/upload",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"upload"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"file-uuid-1234\",\n  \"original_name\": \"document.pdf\",\n  \"current_name\": \"document_a1b2c3d4-e5f6-7890-abcd-ef1234567890.pdf\",\n  \"file_type\": \"application/pdf\",\n  \"size\": 1024000\n}"
+						},
+						{
+							"name": "❌ File Type Not Allowed",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-API-Key",
+										"value": "{{api_key}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": []
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/api/files/upload",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"upload"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": \"File type not allowed\"\n}"
+						},
+						{
+							"name": "❌ File Too Large",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-API-Key",
+										"value": "{{api_key}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": []
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/api/files/upload",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"upload"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": \"File too large. Maximum size is 10MB\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Files List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-API-Key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/files/files",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"files",
+								"files"
+							]
+						},
+						"description": "📋 **List Files**\n\nRetrieve all files for the authenticated application.\n\n**Authentication:** API Key required\n\n**📊 Response Data:**\n- File ID and names (original + current)\n- File type and size information\n- Storage path and metadata\n- Creation timestamp (French format)\n\n**🔒 Security:**\n- Only shows files for authenticated application\n- Isolated data per API key\n- No cross-application access\n\n**📅 Date Format:**\n- French format: dd/mm/yyyy\n- Consistent with frontend display\n\n**🎯 Use Cases:**\n- File management dashboards\n- Gallery displays\n- File browsers\n- Application file audits"
+					},
+					"response": [
+						{
+							"name": "✅ Files Retrieved",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-API-Key",
+										"value": "{{api_key}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/files/files",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"files"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"files\": [\n    {\n      \"id\": \"file-uuid-1\",\n      \"application_id\": \"app-uuid\",\n      \"original_name\": \"document.pdf\",\n      \"current_name\": \"document_uuid-here.pdf\",\n      \"file_path\": \"./uploads/MyApp/document_uuid-here.pdf\",\n      \"file_type\": \"application/pdf\",\n      \"size\": 1024000,\n      \"created_at\": \"2024-01-15T10:30:00.000Z\"\n    },\n    {\n      \"id\": \"file-uuid-2\",\n      \"application_id\": \"app-uuid\",\n      \"original_name\": \"image.jpg\",\n      \"current_name\": \"image_uuid-here.jpg\",\n      \"file_path\": \"./uploads/MyApp/image_uuid-here.jpg\",\n      \"file_type\": \"image/jpeg\",\n      \"size\": 512000,\n      \"created_at\": \"2024-01-15T14:22:00.000Z\"\n    }\n  ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Rename File",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "X-API-Key",
+								"value": "{{api_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"new_name\": \"my-renamed-document\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/files/files/{{file_id}}/rename",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"files",
+								"files",
+								"{{file_id}}",
+								"rename"
+							]
+						},
+						"description": "✏️ **Rename File**\n\nUpdate the display name of a file while preserving the extension.\n\n**Authentication:** API Key required\n\n**🔒 Security Features:**\n- Filename sanitization\n- Invalid character removal\n- Extension preservation\n- Path traversal prevention\n\n**📝 Validation Rules:**\n- Name cannot be empty\n- Invalid characters: `< > : \" / \\ | ? *`\n- Original extension is preserved\n- Unique storage name unchanged\n\n**💡 How it Works:**\n1. Validates new name format\n2. Sanitizes input for security\n3. Updates file system and database\n4. Preserves original file extension\n\n**🎯 Use Cases:**\n- User-friendly file naming\n- Document organization\n- File management systems"
+					},
+					"response": [
+						{
+							"name": "✅ File Renamed",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "X-API-Key",
+										"value": "{{api_key}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"new_name\": \"my-renamed-document\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/files/files/file-uuid/rename",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"files",
+										"file-uuid",
+										"rename"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"success\": true,\n  \"new_name\": \"my-renamed-document.pdf\"\n}"
+						},
+						{
+							"name": "❌ Invalid Characters",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "X-API-Key",
+										"value": "{{api_key}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"new_name\": \"invalid<>name\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/files/files/file-uuid/rename",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"files",
+										"file-uuid",
+										"rename"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": \"Filename contains invalid characters\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Convert Image to SVG",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('svg_file_id', response.id);",
+									"    console.log('✅ Image converted to SVG:', response.current_name);",
+									"    console.log('🆔 SVG file ID saved to environment');",
+									"    console.log('📊 New size:', Math.round(response.size / 1024) + ' KB');",
+									"} else {",
+									"    console.log('❌ SVG conversion failed');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-API-Key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/files/files/{{file_id}}/convert-to-svg",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"files",
+								"files",
+								"{{file_id}}",
+								"convert-to-svg"
+							]
+						},
+						"description": "🖼️ **Convert Image to SVG**\n\nTransform image files into scalable SVG format for web optimization.\n\n**Authentication:** API Key required\n\n**📋 Requirements:**\n- File must be an image type\n- Supported: JPEG, PNG, GIF, WebP\n- Original file remains unchanged\n\n**⚡ Process:**\n1. Validates file is an image\n2. Extracts image dimensions\n3. Creates SVG wrapper with embedded image\n4. Saves as new SVG file\n5. Returns new file metadata\n\n**🎯 Benefits:**\n- Scalable vector format\n- Web-optimized display\n- Maintains image quality\n- Smaller file sizes (often)\n\n**💡 Output:**\n- New SVG file created\n- Original name + \" (SVG)\"\n- Separate file ID\n- MIME type: image/svg+xml\n\n**🚀 Use Cases:**\n- Web graphics optimization\n- Responsive image display\n- Print-ready graphics\n- Icon generation"
+					},
+					"response": [
+						{
+							"name": "✅ Image Converted to SVG",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-API-Key",
+										"value": "{{api_key}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/files/files/file-uuid/convert-to-svg",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"files",
+										"file-uuid",
+										"convert-to-svg"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"svg-file-uuid\",\n  \"original_name\": \"image.jpg (SVG)\",\n  \"current_name\": \"image_uuid-here.svg\",\n  \"file_type\": \"image/svg+xml\",\n  \"size\": 2048\n}"
+						},
+						{
+							"name": "❌ Not an Image",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-API-Key",
+										"value": "{{api_key}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/files/files/pdf-file-uuid/convert-to-svg",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"files",
+										"pdf-file-uuid",
+										"convert-to-svg"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": \"File must be an image\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Download File",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-API-Key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/files/files/{{file_id}}/download",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"files",
+								"files",
+								"{{file_id}}",
+								"download"
+							]
+						},
+						"description": "⬇️ **Download File**\n\nRetrieve file contents with proper headers for browser download.\n\n**Authentication:** API Key required\n\n**📦 Response Format:**\n- **Content-Type**: Original file MIME type\n- **Content-Disposition**: `attachment; filename=\"original-name.ext\"`\n- **Body**: Binary file data\n\n**🔒 Security Features:**\n- API key validation\n- File ownership verification\n- Safe filename headers\n- No path traversal risks\n\n**💻 Browser Behavior:**\n- Triggers automatic download\n- Uses original filename\n- Preserves file type association\n- No inline display (security)\n\n**📊 Supported Files:**\n- Documents (PDF)\n- Images (JPEG, PNG, GIF, WebP)\n- Text files\n- Generated SVG files\n\n**🎯 Use Cases:**\n- File sharing systems\n- Document management\n- Backup and export\n- User file access"
+					},
+					"response": [
+						{
+							"name": "✅ File Downloaded",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-API-Key",
+										"value": "{{api_key}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/files/files/file-uuid/download",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"files",
+										"file-uuid",
+										"download"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/pdf"
+								},
+								{
+									"key": "Content-Disposition",
+									"value": "attachment; filename=\"document.pdf\""
+								}
+							],
+							"cookie": [],
+							"body": "[Binary file data - actual file contents]"
+						},
+						{
+							"name": "❌ File Not Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-API-Key",
+										"value": "{{api_key}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/files/files/nonexistent-uuid/download",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"files",
+										"nonexistent-uuid",
+										"download"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": \"File not found\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete File",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-API-Key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/files/files/{{file_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"files",
+								"files",
+								"{{file_id}}"
+							]
+						},
+						"description": "🗑️ **Delete File**\n\nPermanently remove a file from both database and file system.\n\n**Authentication:** API Key required\n\n**⚠️ DESTRUCTIVE OPERATION:**\n- Removes file from disk\n- Deletes database record\n- Cannot be undone\n- Immediate effect\n\n**🔒 Security:**\n- API key validation\n- File ownership verification\n- No cross-application access\n- Safe file path handling\n\n**📁 Cleanup Process:**\n1. Validates file ownership\n2. Removes physical file\n3. Deletes database record\n4. Returns success confirmation\n\n**💡 Error Handling:**\n- File not found: 404 error\n- Disk errors: Logged but operation continues\n- Database cleanup: Always attempted\n\n**🎯 Use Cases:**\n- File management cleanup\n- Storage optimization\n- User file deletion\n- Application cleanup"
+					},
+					"response": [
+						{
+							"name": "✅ File Deleted",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "X-API-Key",
+										"value": "{{api_key}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/files/files/file-uuid",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"files",
+										"file-uuid"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"success\": true\n}"
+						},
+						{
+							"name": "❌ File Not Found",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "X-API-Key",
+										"value": "{{api_key}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/files/files/nonexistent-uuid",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"files",
+										"nonexistent-uuid"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": \"File not found\"\n}"
+						}
+					]
+				}
+			],
+			"description": "📁 **File Operations**\n\nComplete file lifecycle management with security validation, processing capabilities, and isolated storage per application."
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3001",
+			"type": "string",
+			"description": "Base URL for File Manager API"
+		}
+	]
+}

@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: file-manager-backend
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-this-in-production}
+
+  frontend:
+    build: ./frontend
+    container_name: file-manager-frontend
+    ports:
+      - "3002:80"
+    depends_on:
+      - backend
+
+volumes:
+  data:
+  uploads:

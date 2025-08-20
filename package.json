@@ -1,0 +1,30 @@
+{
+  "name": "file-manager",
+  "version": "1.0.0",
+  "description": "Modern, secure file management system with multi-application support",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd backend && npm run build && cd ../frontend && npm run build",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm run preview"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.9.2"
+  },
+  "keywords": ["file-manager", "api", "react", "fastify", "typescript", "security", "multi-application"],
+  "author": "File Manager Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/file-manager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/file-manager/issues"
+  },
+  "homepage": "https://github.com/your-username/file-manager#readme"
+}
