@@ -44,7 +44,7 @@ export async function fileRoutes(fastify: FastifyInstance) {
         const stats = await getFileStats(filePath);
         const fileId = uuidv4();
 
-        await database.run(
+        database.run(
             'INSERT INTO files (id, application_id, original_name, current_name, file_path, file_type, size) VALUES (?, ?, ?, ?, ?, ?, ?)',
             [fileId, application.id, originalName, uniqueName, filePath, data.mimetype, stats.size]
         );
@@ -58,9 +58,9 @@ export async function fileRoutes(fastify: FastifyInstance) {
         });
     });
 
-    fastify.get('/files', async (request) => {
+    fastify.get('/files', (request) => {
         const { application } = request;
-        const files = await database.all(
+        const files = database.all(
             'SELECT * FROM files WHERE application_id = ?',
             [application.id]
         );
@@ -83,7 +83,7 @@ export async function fileRoutes(fastify: FastifyInstance) {
             return;
         }
 
-        const file = await database.get(
+        const file = database.get(
             'SELECT * FROM files WHERE id = ? AND application_id = ?',
             [id, application.id]
         );
@@ -101,7 +101,7 @@ export async function fileRoutes(fastify: FastifyInstance) {
         try {
             await fs.rename(oldPath, newPath);
 
-            await database.run(
+            database.run(
                 'UPDATE files SET current_name = ?, file_path = ? WHERE id = ?',
                 [newFileName, newPath, id]
             );
@@ -116,7 +116,7 @@ export async function fileRoutes(fastify: FastifyInstance) {
         const { id } = request.params as { id: string };
         const { application } = request;
 
-        const file = await database.get(
+        const file = database.get(
             'SELECT * FROM files WHERE id = ? AND application_id = ?',
             [id, application.id]
         );
@@ -140,7 +140,7 @@ export async function fileRoutes(fastify: FastifyInstance) {
             const stats = await getFileStats(webpPath);
             const webpFileId = uuidv4();
 
-            await database.run(
+            database.run(
                 'INSERT INTO files (id, application_id, original_name, current_name, file_path, file_type, size) VALUES (?, ?, ?, ?, ?, ?, ?)',
                 [webpFileId, application.id, file.original_name + ' (WebP)', webpFileName, webpPath, 'image/webp', stats.size]
             );
@@ -161,7 +161,7 @@ export async function fileRoutes(fastify: FastifyInstance) {
         const { id } = request.params as { id: string };
         const { application } = request;
 
-        const file = await database.get(
+        const file = database.get(
             'SELECT * FROM files WHERE id = ? AND application_id = ?',
             [id, application.id]
         );
@@ -172,7 +172,7 @@ export async function fileRoutes(fastify: FastifyInstance) {
         }
 
         await deleteFile(file.file_path);
-        await database.run('DELETE FROM files WHERE id = ?', [id]);
+        database.run('DELETE FROM files WHERE id = ?', [id]);
 
         reply.send({ success: true });
     });
@@ -181,7 +181,7 @@ export async function fileRoutes(fastify: FastifyInstance) {
         const { id } = request.params as { id: string };
         const { application } = request;
 
-        const file = await database.get(
+        const file = database.get(
             'SELECT * FROM files WHERE id = ? AND application_id = ?',
             [id, application.id]
         );
