@@ -2,8 +2,6 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Update npm to latest version
-RUN npm install -g npm@latest
 
 COPY backend/package*.json ./
 RUN npm install
