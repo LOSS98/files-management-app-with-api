@@ -5,8 +5,8 @@ import { verifyToken } from '../auth';
 export async function userRoutes(fastify: FastifyInstance) {
     fastify.addHook('preHandler', verifyToken);
 
-    fastify.get('/applications', async () => {
-        const applications = await database.all('SELECT * FROM applications');
+    fastify.get('/applications', () => {
+        const applications = database.all('SELECT * FROM applications');
         return { applications };
     });
 }
