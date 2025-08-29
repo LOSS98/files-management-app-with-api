@@ -35,7 +35,7 @@ services:
         - VITE_PRODUCTION_PROTOCOL=${VITE_PRODUCTION_PROTOCOL:-https}
     container_name: file-manager-frontend
     ports:
-      - "${FRONTEND_PORT:-3002}:80"
+      - "${FRONTEND_PORT:-3002}:3002"
     depends_on:
       - backend
 
