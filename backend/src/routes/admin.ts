@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import bcrypt from 'bcrypt';
+import bcryptjs from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { database } from '../database';
 import { verifyToken, requireAdmin } from '../auth';
@@ -10,12 +10,12 @@ export async function adminRoutes(fastify: FastifyInstance) {
     fastify.addHook('preHandler', verifyToken);
     fastify.addHook('preHandler', requireAdmin);
 
-    fastify.get('/users', async () => {
-        const users = await database.all('SELECT id, username, role, created_at FROM users');
+    fastify.get('/users', () => {
+        const users = database.all('SELECT id, username, role, created_at FROM users');
         return { users };
     });
 
-    fastify.post('/users', async (request, reply) => {
+    fastify.post('/users', (request, reply) => {
         const { username, password, role } = request.body as { username: string; password: string; role: string };
 
         if (!username || !password || !role) {
@@ -54,10 +54,10 @@ export async function adminRoutes(fastify: FastifyInstance) {
         }
 
         try {
-            const hashedPassword = await bcrypt.hash(password, 12);
+            const hashedPassword = bcryptjs.hashSync(password, 12);
             const userId = uuidv4();
 
-            await database.run(
+            database.run(
                 'INSERT INTO users (id, username, password, role) VALUES (?, ?, ?, ?)',
                 [userId, username, hashedPassword, role]
             );
@@ -68,9 +68,9 @@ export async function adminRoutes(fastify: FastifyInstance) {
         }
     });
 
-    fastify.delete('/users/:id', async (request) => {
+    fastify.delete('/users/:id', (request) => {
         const { id } = request.params as { id: string };
-        await database.run('DELETE FROM users WHERE id = ?', [id]);
+        database.run('DELETE FROM users WHERE id = ?', [id]);
         return { success: true };
     });
 
@@ -106,7 +106,7 @@ export async function adminRoutes(fastify: FastifyInstance) {
 
             await ensureDirectoryExists(folderPath);
 
-            await database.run(
+            database.run(
                 'INSERT INTO applications (id, name, api_key, folder_path) VALUES (?, ?, ?, ?)',
                 [appId, name, apiKey, folderPath]
             );
@@ -117,18 +117,18 @@ export async function adminRoutes(fastify: FastifyInstance) {
         }
     });
 
-    fastify.delete('/applications/:id', async (request) => {
+    fastify.delete('/applications/:id', (request) => {
         const { id } = request.params as { id: string };
-        await database.run('DELETE FROM applications WHERE id = ?', [id]);
-        await database.run('DELETE FROM files WHERE application_id = ?', [id]);
+        database.run('DELETE FROM applications WHERE id = ?', [id]);
+        database.run('DELETE FROM files WHERE application_id = ?', [id]);
         return { success: true };
     });
 
-    fastify.put('/applications/:id/regenerate-key', async (request) => {
+    fastify.put('/applications/:id/regenerate-key', (request) => {
         const { id } = request.params as { id: string };
         const newApiKey = `app_${uuidv4().replace(/-/g, '')}`;
 
-        await database.run('UPDATE applications SET api_key = ? WHERE id = ?', [newApiKey, id]);
+        database.run('UPDATE applications SET api_key = ? WHERE id = ?', [newApiKey, id]);
 
         return { api_key: newApiKey };
     });
