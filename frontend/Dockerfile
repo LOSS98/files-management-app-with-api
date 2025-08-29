@@ -27,9 +27,9 @@ ENV VITE_PRODUCTION_PROTOCOL=$VITE_PRODUCTION_PROTOCOL
 
 RUN npm run build
 
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/nginx.conf
-
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+FROM node:22-alpine
+COPY --from=build /app/dist /app/dist
+WORKDIR /app
+RUN npm install -g serve
+EXPOSE 3002
+CMD ["serve", "-s", "dist", "-p", "3002"]
