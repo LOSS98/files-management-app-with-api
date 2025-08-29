@@ -58,7 +58,7 @@ export async function fileRoutes(fastify: FastifyInstance) {
         });
     });
 
-    fastify.get('/files', (request) => {
+    fastify.get('', (request) => {
         const { application } = request;
         const files = database.all(
             'SELECT * FROM files WHERE application_id = ?',
@@ -67,7 +67,7 @@ export async function fileRoutes(fastify: FastifyInstance) {
         return { files };
     });
 
-    fastify.put('/files/:id/rename', async (request, reply) => {
+    fastify.put('/:id/rename', async (request, reply) => {
         const { id } = request.params as { id: string };
         const { new_name } = request.body as { new_name: string };
         const { application } = request;
@@ -112,7 +112,7 @@ export async function fileRoutes(fastify: FastifyInstance) {
         }
     });
 
-    fastify.post('/files/:id/convert-to-webp', async (request, reply) => {
+    fastify.post('/:id/convert-to-webp', async (request, reply) => {
         const { id } = request.params as { id: string };
         const { application } = request;
 
@@ -157,7 +157,7 @@ export async function fileRoutes(fastify: FastifyInstance) {
         }
     });
 
-    fastify.delete('/files/:id', async (request, reply) => {
+    fastify.delete('/:id', async (request, reply) => {
         const { id } = request.params as { id: string };
         const { application } = request;
 
@@ -177,7 +177,7 @@ export async function fileRoutes(fastify: FastifyInstance) {
         reply.send({ success: true });
     });
 
-    fastify.get('/files/:id/download', async (request, reply) => {
+    fastify.get('/:id/download', async (request, reply) => {
         const { id } = request.params as { id: string };
         const { application } = request;
 

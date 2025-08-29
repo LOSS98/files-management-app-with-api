@@ -74,12 +74,12 @@ export const createFileAPI = (apiKey: string) => {
             formData.append('file', file);
             return fileAPI.post('/upload', formData);
         },
-        getFiles: () => fileAPI.get('/files'),
+        getFiles: () => fileAPI.get(''),
         renameFile: (id: string, newName: string) =>
-            fileAPI.put(`/files/${id}/rename`, { new_name: newName }),
-        convertToWebp: (id: string) => fileAPI.post(`/files/${id}/convert-to-webp`),
-        deleteFile: (id: string) => fileAPI.delete(`/files/${id}`),
-        downloadFile: (id: string) => fileAPI.get(`/files/${id}/download`, { responseType: 'blob' }),
+            fileAPI.put(`/${id}/rename`, { new_name: newName }),
+        convertToWebp: (id: string) => fileAPI.post(`/${id}/convert-to-webp`),
+        deleteFile: (id: string) => fileAPI.delete(`/${id}`),
+        downloadFile: (id: string) => fileAPI.get(`/${id}/download`, { responseType: 'blob' }),
     };
 };
 

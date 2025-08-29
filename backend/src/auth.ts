@@ -49,7 +49,7 @@ export async function verifyToken(request: FastifyRequest, reply: FastifyReply) 
     }
 }
 
-export function verifyApiKey(request: FastifyRequest, reply: FastifyReply) {
+export async function verifyApiKey(request: FastifyRequest, reply: FastifyReply) {
     const apiKey = request.headers['x-api-key'] as string;
     if (!apiKey) {
         reply.code(401).send({ error: 'API key required' });

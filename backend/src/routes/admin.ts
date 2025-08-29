@@ -68,10 +68,15 @@ export async function adminRoutes(fastify: FastifyInstance) {
         }
     });
 
-    fastify.delete('/users/:id', (request) => {
+    fastify.delete('/users/:id', async (request, reply) => {
         const { id } = request.params as { id: string };
-        database.run('DELETE FROM users WHERE id = ?', [id]);
-        return { success: true };
+        
+        try {
+            database.run('DELETE FROM users WHERE id = ?', [id]);
+            reply.send({ success: true });
+        } catch (error) {
+            reply.code(500).send({ error: 'Failed to delete user' });
+        }
     });
 
 
@@ -117,19 +122,27 @@ export async function adminRoutes(fastify: FastifyInstance) {
         }
     });
 
-    fastify.delete('/applications/:id', (request) => {
+    fastify.delete('/applications/:id', async (request, reply) => {
         const { id } = request.params as { id: string };
-        database.run('DELETE FROM applications WHERE id = ?', [id]);
-        database.run('DELETE FROM files WHERE application_id = ?', [id]);
-        return { success: true };
+        
+        try {
+            database.run('DELETE FROM applications WHERE id = ?', [id]);
+            database.run('DELETE FROM files WHERE application_id = ?', [id]);
+            reply.send({ success: true });
+        } catch (error) {
+            reply.code(500).send({ error: 'Failed to delete application' });
+        }
     });
 
-    fastify.put('/applications/:id/regenerate-key', (request) => {
+    fastify.put('/applications/:id/regenerate-key', async (request, reply) => {
         const { id } = request.params as { id: string };
         const newApiKey = `app_${uuidv4().replace(/-/g, '')}`;
 
-        database.run('UPDATE applications SET api_key = ? WHERE id = ?', [newApiKey, id]);
-
-        return { api_key: newApiKey };
+        try {
+            database.run('UPDATE applications SET api_key = ? WHERE id = ?', [newApiKey, id]);
+            reply.send({ api_key: newApiKey });
+        } catch (error) {
+            reply.code(500).send({ error: 'Failed to regenerate API key' });
+        }
     });
 }

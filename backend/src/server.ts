@@ -17,7 +17,8 @@ const fastify = Fastify({
 async function start() {
     await fastify.register(cors, {
         origin: config.getCorsOrigins(),
-        credentials: true
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
     });
 
     await fastify.register(multipart, {
