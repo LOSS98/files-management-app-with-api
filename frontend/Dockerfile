@@ -5,11 +5,11 @@ WORKDIR /app
 # Update npm to latest version
 RUN npm install -g npm@latest
 
-COPY package*.json ./
+COPY frontend/package*.json ./
 RUN npm install
 
-COPY . .
-COPY ../config.ts ./src/
+COPY frontend/ ./
+COPY config.ts ./src/
 
 # Build arguments for environment variables
 ARG VITE_BACKEND_DOMAIN

@@ -5,13 +5,13 @@ WORKDIR /app
 # Update npm to latest version
 RUN npm install -g npm@latest
 
-COPY package*.json ./
+COPY backend/package*.json ./
 RUN npm install
 
 RUN npm install -g typescript
 
-COPY . .
-COPY ../config.ts ./src/
+COPY backend/ ./
+COPY config.ts ./src/
 RUN npm run build
 
 RUN mkdir -p data uploads

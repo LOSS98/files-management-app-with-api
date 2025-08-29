@@ -1,7 +1,9 @@
 
 services:
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: file-manager-backend
     ports:
       - "${BACKEND_PORT:-3001}:${BACKEND_PORT:-3001}"
@@ -23,7 +25,8 @@ services:
 
   frontend:
     build: 
-      context: ./frontend
+      context: .
+      dockerfile: frontend/Dockerfile
       args:
         - VITE_BACKEND_DOMAIN=${VITE_BACKEND_DOMAIN:-localhost}
         - VITE_BACKEND_PORT=${VITE_BACKEND_PORT:-3001}
