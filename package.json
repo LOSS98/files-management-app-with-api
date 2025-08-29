@@ -13,7 +13,7 @@
     "start:frontend": "cd frontend && npm run preview"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2",
+    "concurrently": "^9.2.1",
     "typescript": "^5.9.2"
   },
   "keywords": ["file-manager", "api", "react", "fastify", "typescript", "security", "multi-application"],
@@ -21,10 +21,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/file-manager.git"
+    "url": "https://github.com/LOSS98/files-management-app-with-api.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/file-manager/issues"
+    "url": "https://github.com/LOSS98/files-management-app-with-api/issues"
   },
-  "homepage": "https://github.com/your-username/file-manager#readme"
+  "homepage": "https://github.com/LOSS98/files-management-app-with-api#readme"
 }

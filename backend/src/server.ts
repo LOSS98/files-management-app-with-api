@@ -7,6 +7,7 @@ import { authRoutes } from './routes/auth';
 import { adminRoutes } from './routes/admin';
 import { userRoutes } from './routes/user';
 import { fileRoutes } from './routes/files';
+import { config } from './config';
 
 const fastify = Fastify({ 
     logger: true,
@@ -15,9 +16,7 @@ const fastify = Fastify({
 
 async function start() {
     await fastify.register(cors, {
-        origin: process.env.NODE_ENV === 'production' 
-            ? ['http://localhost:3000', 'https://your-domain.com']
-            : true,
+        origin: config.getCorsOrigins(),
         credentials: true
     });
 
@@ -43,8 +42,8 @@ async function start() {
     });
 
     try {
-        await fastify.listen({ port: 3001, host: '0.0.0.0' });
-        console.log('Server running on http://localhost:3001');
+        await fastify.listen({ port: config.port, host: config.host });
+        console.log(`Server running on ${config.getBackendUrl()}`);
     } catch (err) {
         fastify.log.error(err);
         process.exit(1);
