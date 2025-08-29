@@ -7,7 +7,6 @@ COPY frontend/package*.json ./
 RUN npm install
 
 COPY frontend/ ./
-COPY config.ts ./src/
 
 # Build arguments for environment variables
 ARG VITE_BACKEND_DOMAIN
