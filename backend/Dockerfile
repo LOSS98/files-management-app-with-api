@@ -11,6 +11,7 @@ RUN npm install
 RUN npm install -g typescript
 
 COPY . .
+COPY ../config.ts ./src/
 RUN npm run build
 
 RUN mkdir -p data uploads
