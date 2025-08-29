@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+import bcryptjs from 'bcryptjs';
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { database } from './database';
 import { AuthToken } from './types';
@@ -9,15 +9,15 @@ if (!process.env.JWT_SECRET) {
     console.warn('JWT_SECRET not set, using fallback. Set JWT_SECRET for production!');
 }
 
-export async function authenticateUser(username: string, password: string) {
+export function authenticateUser(username: string, password: string) {
     if (!username || !password) {
         return null;
     }
     
-    const user = await database.get('SELECT * FROM users WHERE username = ?', [username]);
+    const user = database.get('SELECT * FROM users WHERE username = ?', [username]);
     if (!user) return null;
 
-    const isValid = await bcrypt.compare(password, user.password);
+    const isValid = bcryptjs.compareSync(password, user.password);
     if (!isValid) return null;
 
     const token = jwt.sign(
@@ -49,14 +49,14 @@ export async function verifyToken(request: FastifyRequest, reply: FastifyReply) 
     }
 }
 
-export async function verifyApiKey(request: FastifyRequest, reply: FastifyReply) {
+export function verifyApiKey(request: FastifyRequest, reply: FastifyReply) {
     const apiKey = request.headers['x-api-key'] as string;
     if (!apiKey) {
         reply.code(401).send({ error: 'API key required' });
         return;
     }
 
-    const application = await database.get('SELECT * FROM applications WHERE api_key = ?', [apiKey]);
+    const application = database.get('SELECT * FROM applications WHERE api_key = ?', [apiKey]);
     if (!application) {
         reply.code(401).send({ error: 'Invalid API key' });
         return;
