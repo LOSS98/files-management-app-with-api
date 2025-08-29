@@ -7,7 +7,7 @@ import { authRoutes } from './routes/auth';
 import { adminRoutes } from './routes/admin';
 import { userRoutes } from './routes/user';
 import { fileRoutes } from './routes/files';
-import { config } from './config';
+import { config } from '../../config';
 
 const fastify = Fastify({ 
     logger: true,
