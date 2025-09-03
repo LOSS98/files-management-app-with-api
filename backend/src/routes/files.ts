@@ -22,7 +22,7 @@ export async function fileRoutes(fastify: FastifyInstance) {
             return;
         }
 
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf', 'text/plain'];
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'application/pdf', 'text/plain'];
         if (!allowedTypes.includes(data.mimetype || '')) {
             reply.code(400).send({ error: 'File type not allowed' });
             return;
@@ -154,8 +154,8 @@ export async function fileRoutes(fastify: FastifyInstance) {
             return;
         }
 
-        if (!file.file_type.startsWith('image/') || file.file_type === 'image/webp') {
-            reply.code(400).send({ error: 'File must be a non-WebP image' });
+        if (!file.file_type.startsWith('image/') || file.file_type === 'image/webp' || file.file_type === 'image/svg+xml') {
+            reply.code(400).send({ error: 'File must be a non-WebP, non-SVG image' });
             return;
         }
 
@@ -183,6 +183,66 @@ export async function fileRoutes(fastify: FastifyInstance) {
             });
         } catch (error) {
             reply.code(500).send({ error: 'Failed to convert image to WebP' });
+        }
+    });
+
+    fastify.post('/:id/convert-to-svg', async (request, reply) => {
+        const { id } = request.params as { id: string };
+        const { application } = request;
+
+        const file = database.get(
+            'SELECT * FROM files WHERE id = ? AND application_id = ?',
+            [id, application.id]
+        );
+
+        if (!file) {
+            reply.code(404).send({ error: 'File not found' });
+            return;
+        }
+
+        if (!file.file_type.startsWith('image/') || file.file_type === 'image/svg+xml') {
+            reply.code(400).send({ error: 'File must be a non-SVG image' });
+            return;
+        }
+
+        const svgFileName = file.current_name.replace(/\.[^.]+$/, '.svg');
+        const svgPath = path.join(application.folder_path, svgFileName);
+
+        try {
+            const imageBuffer = await fs.readFile(file.file_path);
+            const base64Data = imageBuffer.toString('base64');
+            
+            const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <image href="data:${file.file_type};base64,${base64Data}" />
+</svg>`;
+
+            await fs.writeFile(svgPath, svgContent);
+
+            const stats = await getFileStats(svgPath);
+            const svgFileId = uuidv4();
+
+            database.run(
+                'INSERT INTO files (id, application_id, original_name, current_name, file_path, file_type, size, is_public) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                [svgFileId, application.id, file.original_name + ' (SVG)', svgFileName, svgPath, 'image/svg+xml', stats.size, file.is_public]
+            );
+
+            const response: any = {
+                id: svgFileId,
+                original_name: file.original_name + ' (SVG)',
+                current_name: svgFileName,
+                file_type: 'image/svg+xml',
+                size: stats.size,
+                is_public: file.is_public === 1
+            };
+
+            if (file.is_public === 1) {
+                response.public_url = `${config.getBackendUrl()}/public/${svgFileId}`;
+            }
+
+            reply.send(response);
+        } catch (error) {
+            reply.code(500).send({ error: 'Failed to convert image to SVG' });
         }
     });
 

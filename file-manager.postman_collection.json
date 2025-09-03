@@ -969,7 +969,7 @@
 								"upload"
 							]
 						},
-						"description": "📤 **Upload File**\n\nUpload files with comprehensive security validation and processing.\n\n**Authentication:** API Key required (`X-API-Key` header)\n\n**📋 File Restrictions:**\n- **Allowed Types**: JPEG, PNG, GIF, WebP, PDF, Plain Text\n- **Max Size**: 1GB per file\n- **Security**: Filename sanitization, type validation\n\n**🔒 Security Features:**\n- MIME type validation\n- File size limits\n- Filename sanitization\n- UUID-based unique naming\n- Isolated storage per application\n\n**📁 Storage:**\n- Original filename preserved in metadata\n- Unique filename generated for storage\n- Organized by application folder\n\n**🔓 Public Access:**\n- Set `is_public` to `true` for public access\n- Public files accessible via `/public/{file_id}` without authentication\n- Perfect for images in HTML `<img src=\"/public/{file_id}\">` tags\n\n**🎯 Use Cases:**\n- Document management\n- Image galleries\n- File sharing systems\n- Content management\n- Public assets (images, documents)"
+						"description": "📤 **Upload File**\n\nUpload files with comprehensive security validation and processing.\n\n**Authentication:** API Key required (`X-API-Key` header)\n\n**📋 File Restrictions:**\n- **Allowed Types**: JPEG, PNG, GIF, WebP, SVG, PDF, Plain Text\n- **Max Size**: 1GB per file\n- **Security**: Filename sanitization, type validation\n\n**🔒 Security Features:**\n- MIME type validation\n- File size limits\n- Filename sanitization\n- UUID-based unique naming\n- Isolated storage per application\n\n**📁 Storage:**\n- Original filename preserved in metadata\n- Unique filename generated for storage\n- Organized by application folder\n\n**🔓 Public Access:**\n- Set `is_public` to `true` for public access\n- Public files accessible via `/public/{file_id}` without authentication\n- Perfect for images in HTML `<img src=\"/public/{file_id}\">` tags\n\n**🎯 Use Cases:**\n- Document management\n- Image galleries\n- File sharing systems\n- Content management\n- Public assets (images, documents)"
 					},
 					"response": [
 						{
@@ -1414,7 +1414,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n  \"error\": \"File must be an image\"\n}"
+							"body": "{\n  \"error\": \"File must be a non-SVG image\"\n}"
 						}
 					]
 				},

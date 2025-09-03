@@ -1,0 +1,3953 @@
+{
+  "info": {
+    "_postman_id": "b8d6f3c1-4e2a-4b9f-a1c0-7d8e9f1a2b3c",
+    "name": "Byrsthos Athletics API",
+    "description": "Complete API collection for the Byrsthos Athletics management system. This collection includes all public and admin endpoints for managing athletic competitions, athletes, results, and administrative operations.\n\n## Authentication\nMost endpoints require Bearer token authentication. First authenticate using the login endpoint to obtain an access token.\n\n## Base URLs\n- Development: `http://localhost:8000`\n- Production: `https://api.byrsthos.com`\n\n## API Version\nAll admin endpoints are prefixed with `/api/v1`",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Public Endpoints",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            },
+            "description": "Check API health status and availability"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/health",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "health"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"count\": 1,\n    \"datetime\": \"2024-01-15T10:30:00Z\",\n    \"data\": {\n        \"status\": \"healthy\",\n        \"message\": \"API is running\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Root Welcome",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                ""
+              ]
+            },
+            "description": "Root endpoint with welcome message"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    ""
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"count\": 1,\n    \"datetime\": \"2024-01-15T10:30:00Z\",\n    \"data\": {\n        \"message\": \"Welcome to Byrsthos API\"\n    }\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Public endpoints that don't require authentication"
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"\",\n    \"password\": \"\",\n    \"admin_type\": \"volunteer\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Register a new user account. Returns user information without sensitive data."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"username\": \"\",\n    \"password\": \"\",\n    \"admin_type\": \"volunteer\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/auth/register",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "register"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"count\": 1,\n    \"datetime\": \"2024-01-15T10:30:00Z\",\n    \"data\": {\n        \"id\": 1,\n        \"username\": \"john_doe\",\n        \"admin_type\": \"volunteer\",\n        \"created_at\": \"2024-01-15T10:30:00Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('access_token', response.data.access_token);",
+                  "    pm.environment.set('refresh_token', response.data.refresh_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "john_doe",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "securePassword123",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Authenticate user and receive JWT access token and refresh token. The test script automatically saves tokens to environment variables."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "username",
+                      "value": "",
+                      "type": "text"
+                    },
+                    {
+                      "key": "password",
+                      "value": "",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"count\": 1,\n    \"datetime\": \"2024-01-15T10:30:00Z\",\n    \"data\": {\n        \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n        \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n        \"token_type\": \"bearer\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('access_token', response.data.access_token);",
+                  "    pm.environment.set('refresh_token', response.data.refresh_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/refresh",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Refresh access token using refresh token. Returns new access and refresh tokens."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Logout user by revoking refresh token"
+          }
+        }
+      ],
+      "description": "Authentication endpoints for user registration, login, token refresh, and logout"
+    },
+    {
+      "name": "Users",
+      "description": "All user management operations including CRUD operations and password management",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "",
+                  "description": "Number of records to skip",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "",
+                  "description": "Maximum number of records to return",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retrieve a paginated list of all users"
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "users",
+                "{{user_id}}"
+              ]
+            },
+            "description": "Retrieve a specific user by their ID"
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"\",\n    \"password\": \"\",\n    \"admin_type\": \"volunteer\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin"
+              ]
+            },
+            "description": "Create a new user account"
+          }
+        },
+        {
+          "name": "Update User (Full)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"\",\n    \"admin_type\": \"administrator\",\n    \"password\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "users",
+                "{{user_id}}"
+              ]
+            },
+            "description": "Update all user information (full replacement)"
+          }
+        },
+        {
+          "name": "Update User (Partial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"admin_type\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "users",
+                "{{user_id}}"
+              ]
+            },
+            "description": "Partially update user information"
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/users/{{user_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "users",
+                "{{user_id}}"
+              ]
+            },
+            "description": "Delete a user account"
+          }
+        },
+        {
+          "name": "Reset User Password",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"new_password\": \"newSecurePassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/users/{{user_id}}/reset-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "users",
+                "{{user_id}}",
+                "reset-password"
+              ]
+            },
+            "description": "Reset password for a user (LOC+ can reset any user, others can only reset their own)"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"new_password\": \"newSecurePassword123\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/admin/users/1/reset-password",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "users",
+                    "1",
+                    "reset-password"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"id\": 1,\n    \"username\": \"john.doe\",\n    \"admin_type\": \"volunteer\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"date_of_birth\": \"1985-03-15\",\n    \"phone\": \"+1234567890\",\n    \"npc_code\": \"USA\",\n    \"created_at\": \"2024-01-15T10:00:00Z\",\n    \"npc\": {\n        \"code\": \"USA\",\n        \"name\": \"United States of America\",\n        \"region_code\": \"AMER\",\n        \"flag_file_path\": \"flags/usa.png\",\n        \"created_at\": \"2024-01-01T00:00:00Z\"\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Athletes",
+      "description": "All athlete management operations including CRUD operations and batch operations",
+      "item": [
+        {
+          "name": "Get All Athletes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/athletes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "athletes"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "",
+                  "description": "Number of records to skip",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "",
+                  "description": "Maximum number of records to return",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retrieve a list of athletes with pagination"
+          }
+        },
+        {
+          "name": "Get Athlete by SDMS",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/athletes/{{sdms}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "athletes",
+                "{{sdms}}"
+              ]
+            },
+            "description": "Retrieve a specific athlete by SDMS ID"
+          }
+        },
+        {
+          "name": "Create Athlete",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"sdms\": \"\",\n    \"firstname\": \"\",\n    \"lastname\": \"\",\n    \"npc\": \"\",\n    \"gender\": \"\",\n    \"class_\": \"\",\n    \"date_of_birth\": \"\",\n    \"photo\": null,\n    \"is_guide\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/athletes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "athletes"
+              ]
+            },
+            "description": "Create a new athlete record"
+          }
+        },
+        {
+          "name": "Update Athlete (Full)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"firstname\": \"\",\n    \"lastname\": \"\",\n    \"npc\": \"\",\n    \"gender\": \"\",\n    \"class_\": \"\",\n    \"date_of_birth\": \"\",\n    \"photo\": \"\",\n    \"is_guide\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/athletes/{{sdms}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "athletes",
+                "{{sdms}}"
+              ]
+            },
+            "description": "Update an athlete record (full update)"
+          }
+        },
+        {
+          "name": "Update Athlete (Partial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"class_\": \"\",\n    \"photo\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/athletes/{{sdms}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "athletes",
+                "{{sdms}}"
+              ]
+            },
+            "description": "Update an athlete record (partial update)"
+          }
+        },
+        {
+          "name": "Delete Athlete",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/athletes/{{sdms}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "athletes",
+                "{{sdms}}"
+              ]
+            },
+            "description": "Delete an athlete record"
+          }
+        },
+        {
+          "name": "Delete Multiple Athletes",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"ids\": [123456, 789012, 345678]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/athletes/bulk",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "athletes",
+                "bulk"
+              ]
+            },
+            "description": "Delete multiple athletes by providing a list of SDMS IDs"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"ids\": [123456, 789012, 345678]\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/admin/athletes/bulk",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "athletes",
+                    "bulk"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"deleted\": [123456, 345678],\n    \"not_found\": [789012],\n    \"total_requested\": 3,\n    \"deleted_count\": 2,\n    \"not_found_count\": 1\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Games",
+      "description": "All game/event management operations including CRUD, publishing, and officiating",
+      "item": [
+        {
+          "name": "Get All Games",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/games",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "games"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "",
+                  "description": "Number of records to skip",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "",
+                  "description": "Maximum records to return",
+                  "disabled": true
+                },
+                {
+                  "key": "event",
+                  "value": "",
+                  "description": "Filter by event name",
+                  "disabled": true
+                },
+                {
+                  "key": "genders",
+                  "value": "",
+                  "description": "Filter by genders (comma-separated)",
+                  "disabled": true
+                },
+                {
+                  "key": "classes",
+                  "value": "",
+                  "description": "Filter by classes (comma-separated)",
+                  "disabled": true
+                },
+                {
+                  "key": "day",
+                  "value": "",
+                  "description": "Filter by competition day",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by game status",
+                  "disabled": true
+                },
+                {
+                  "key": "official",
+                  "value": "",
+                  "description": "Filter by official status",
+                  "disabled": true
+                },
+                {
+                  "key": "published",
+                  "value": "",
+                  "description": "Filter by published status",
+                  "disabled": true
+                },
+                {
+                  "key": "wpa_points",
+                  "value": "",
+                  "description": "Filter by WPA points eligibility",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retrieve a paginated list of all games with optional filtering"
+          }
+        },
+        {
+          "name": "Get Game by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/games/{{game_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "games",
+                "{{game_id}}"
+              ]
+            },
+            "description": "Retrieve a specific game by its ID"
+          }
+        },
+        {
+          "name": "Create Game",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"event\": \"\",\n    \"genders\": \"\",\n    \"classes\": \"\",\n    \"phase\": \"\",\n    \"area\": \"\",\n    \"day\": \"\",\n    \"time\": \"\",\n    \"nb_athletes\": 8,\n    \"status\": \"scheduled\",\n    \"published\": false,\n    \"official\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/games",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "games"
+              ]
+            },
+            "description": "Create a new game"
+          }
+        },
+        {
+          "name": "Update Game (Full)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"event\": \"100m\",\n    \"genders\": \"M\",\n    \"classes\": \"T54\",\n    \"phase\": \"Final\",\n    \"area\": \"Main Track\",\n    \"day\": 1,\n    \"time\": \"15:00:00\",\n    \"nb_athletes\": 8,\n    \"status\": \"in_progress\",\n    \"published\": true,\n    \"official\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/games/{{game_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "games",
+                "{{game_id}}"
+              ]
+            },
+            "description": "Update all game information (full replacement)"
+          }
+        },
+        {
+          "name": "Update Game (Partial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"completed\",\n    \"official\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/games/{{game_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "games",
+                "{{game_id}}"
+              ]
+            },
+            "description": "Partially update game information"
+          }
+        },
+        {
+          "name": "Publish Game",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/games/{{game_id}}/publish",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "games",
+                "{{game_id}}",
+                "publish"
+              ]
+            },
+            "description": "Publish a game to make it publicly available"
+          }
+        },
+        {
+          "name": "Officiate Game",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/games/{{game_id}}/officiate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "games",
+                "{{game_id}}",
+                "officiate"
+              ]
+            },
+            "description": "Officiate a game to mark it as officially recognized"
+          }
+        },
+        {
+          "name": "Delete Game",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/games/{{game_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "games",
+                "{{game_id}}"
+              ]
+            },
+            "description": "Delete a game"
+          }
+        },
+        {
+          "name": "Delete Multiple Games",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"ids\": [1, 2, 3, 4, 5]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/games/bulk",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "games",
+                "bulk"
+              ]
+            },
+            "description": "Delete multiple games by providing a list of game IDs"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"ids\": [1, 2, 3, 4, 5]\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/admin/games/bulk",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "games",
+                    "bulk"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"deleted\": [1, 3, 5],\n    \"not_found\": [2, 4],\n    \"total_requested\": 5,\n    \"deleted_count\": 3,\n    \"not_found_count\": 2\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Results",
+      "description": "All result management operations including CRUD operations and game-specific results",
+      "item": [
+        {
+          "name": "Get All Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/results",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "results"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "",
+                  "description": "Number of records to skip",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "",
+                  "description": "Maximum records to return",
+                  "disabled": true
+                },
+                {
+                  "key": "event",
+                  "value": "",
+                  "description": "Filter by event name",
+                  "disabled": true
+                },
+                {
+                  "key": "genders",
+                  "value": "",
+                  "description": "Filter by genders",
+                  "disabled": true
+                },
+                {
+                  "key": "classes",
+                  "value": "",
+                  "description": "Filter by classes",
+                  "disabled": true
+                },
+                {
+                  "key": "day",
+                  "value": "",
+                  "description": "Filter by competition day",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by status",
+                  "disabled": true
+                },
+                {
+                  "key": "official",
+                  "value": "",
+                  "description": "Filter by official status",
+                  "disabled": true
+                },
+                {
+                  "key": "published",
+                  "value": "",
+                  "description": "Filter by published status",
+                  "disabled": true
+                },
+                {
+                  "key": "wpa_points",
+                  "value": "",
+                  "description": "Filter by WPA points",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retrieve a paginated list of all games with detailed results, athlete details, and attempts"
+          }
+        },
+        {
+          "name": "Get Results by Game",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/results/game/{{game_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "results",
+                "game",
+                "{{game_id}}"
+              ]
+            },
+            "description": "Retrieve complete game information with all results, athlete details, and attempts"
+          }
+        },
+        {
+          "name": "Get Result by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/results/{{result_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "results",
+                "{{result_id}}"
+              ]
+            },
+            "description": "Retrieve a specific competition result by its ID"
+          }
+        },
+        {
+          "name": "Create Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"game_id\": 1,\n    \"athlete_sdms\": 123456,\n    \"lane\": 4,\n    \"bib\": 101,\n    \"performance\": 12.34,\n    \"rank\": 1,\n    \"record_indicator\": \"WR\",\n    \"points\": 1200,\n    \"raza_points\": 980,\n    \"guide_sdms\": null,\n    \"disqualified\": false,\n    \"disqualification_rule\": null,\n    \"comments\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/results",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "results"
+              ]
+            },
+            "description": "Create a new competition result"
+          }
+        },
+        {
+          "name": "Update Result (Full)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"game_id\": 1,\n    \"athlete_sdms\": 123456,\n    \"lane\": 4,\n    \"bib\": 101,\n    \"performance\": 12.28,\n    \"rank\": 1,\n    \"record_indicator\": \"WR\",\n    \"points\": 1250,\n    \"raza_points\": 1000,\n    \"guide_sdms\": null,\n    \"disqualified\": false,\n    \"disqualification_rule\": null,\n    \"comments\": \"New World Record\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/results/{{result_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "results",
+                "{{result_id}}"
+              ]
+            },
+            "description": "Update all result information (full replacement)"
+          }
+        },
+        {
+          "name": "Update Result (Partial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"performance\": 12.25,\n    \"rank\": 1,\n    \"record_indicator\": \"WR\",\n    \"comments\": \"Updated World Record\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/results/{{result_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "results",
+                "{{result_id}}"
+              ]
+            },
+            "description": "Partially update result information"
+          }
+        },
+        {
+          "name": "Delete Result",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/results/{{result_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "results",
+                "{{result_id}}"
+              ]
+            },
+            "description": "Delete a competition result"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Attempts",
+      "description": "All attempt management operations including CRUD operations for individual attempts",
+      "item": [
+        {
+          "name": "Get All Attempts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/attempts?skip=0&limit=100",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "attempts"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Retrieve a paginated list of all attempts"
+          }
+        },
+        {
+          "name": "Get Attempt by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/attempts/{{attempt_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "attempts",
+                "{{attempt_id}}"
+              ]
+            },
+            "description": "Retrieve a specific attempt by its ID"
+          }
+        },
+        {
+          "name": "Create Attempt",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"result_id\": 1,\n    \"attempt_number\": 1,\n    \"measurement\": 55.25,\n    \"wind_velocity\": 1.2,\n    \"is_valid\": true,\n    \"is_best\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/attempts",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "attempts"
+              ]
+            },
+            "description": "Create a new attempt record"
+          }
+        },
+        {
+          "name": "Update Attempt (Full)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"result_id\": 1,\n    \"attempt_number\": 1,\n    \"measurement\": 55.80,\n    \"wind_velocity\": 1.0,\n    \"is_valid\": true,\n    \"is_best\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/attempts/{{attempt_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "attempts",
+                "{{attempt_id}}"
+              ]
+            },
+            "description": "Update all attempt information (full replacement)"
+          }
+        },
+        {
+          "name": "Update Attempt (Partial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"measurement\": 56.00,\n    \"is_best\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/attempts/{{attempt_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "attempts",
+                "{{attempt_id}}"
+              ]
+            },
+            "description": "Partially update attempt information"
+          }
+        },
+        {
+          "name": "Delete Attempt",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/attempts/{{attempt_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "attempts",
+                "{{attempt_id}}"
+              ]
+            },
+            "description": "Delete an attempt record"
+          }
+        }
+      ]
+    },
+    {
+      "name": "NPCs (National Paralympic Committees)",
+      "description": "All NPC management operations including CRUD operations and flag management",
+      "item": [
+        {
+          "name": "Get All NPCs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/npcs?skip=0&limit=100",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "npcs"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Retrieve all National Paralympic Committees"
+          }
+        },
+        {
+          "name": "Get NPC by Code",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/npcs/{{npc_code}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "npcs",
+                "{{npc_code}}"
+              ]
+            },
+            "description": "Retrieve a specific NPC by its code"
+          }
+        },
+        {
+          "name": "Create NPC",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"code\": \"USA\",\n    \"name\": \"United States of America\",\n    \"region_code\": \"AME\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/npcs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "npcs"
+              ]
+            },
+            "description": "Create a new NPC"
+          }
+        },
+        {
+          "name": "Upload NPC Flag",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "flag",
+                  "type": "file",
+                  "src": [],
+                  "description": "SVG flag file to upload"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/npcs/{{npc_code}}/upload-flag",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "npcs",
+                "{{npc_code}}",
+                "upload-flag"
+              ]
+            },
+            "description": "Upload an SVG flag for a specific NPC. File is automatically made public and accessible via flag_url in responses."
+          }
+        },
+        {
+          "name": "Update NPC Flag",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "flag",
+                  "type": "file",
+                  "src": [],
+                  "description": "New SVG flag file to replace existing flag"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/npcs/{{npc_code}}/flag",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "npcs",
+                "{{npc_code}}",
+                "flag"
+              ]
+            },
+            "description": "Update/replace the SVG flag for a specific NPC. Deletes old flag and uploads new one as public file."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Regions",
+      "description": "All region management operations including CRUD operations for geographical regions",
+      "item": [
+        {
+          "name": "Get All Regions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/regions?skip=0&limit=100",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "regions"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Retrieve all regions"
+          }
+        },
+        {
+          "name": "Create Region",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"code\": \"EUR\",\n    \"name\": \"Europe\",\n    \"description\": \"European Paralympic Region\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/regions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "regions"
+              ]
+            },
+            "description": "Create a new region"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Record Types",
+      "description": "All record type management operations including CRUD operations for different record classifications",
+      "item": [
+        {
+          "name": "Get All Record Types",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/record-types?skip=0&limit=100",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "record-types"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Retrieve all record types"
+          }
+        },
+        {
+          "name": "Create Record Type",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"code\": \"WR\",\n    \"name\": \"World Record\",\n    \"description\": \"World Paralympic Record\",\n    \"priority\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/record-types",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "record-types"
+              ]
+            },
+            "description": "Create a new record type"
+          }
+        }
+      ]
+    },
+    {
+      "name": "World Records",
+      "description": "All world record management operations including CRUD, approval, and batch operations",
+      "item": [
+        {
+          "name": "Get All World Records",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/world-records?skip=0&limit=100",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "world-records"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Retrieve all world records"
+          }
+        },
+        {
+          "name": "Create World Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"event\": \"100m T54 Men\",\n    \"athlete_class\": \"T54\",\n    \"performance\": \"13.45\",\n    \"location\": \"Olympic Stadium, Tokyo\",\n    \"npc\": \"USA\",\n    \"region_code\": \"AMER\",\n    \"record_date\": \"2024-08-15\",\n    \"record_type\": \"WR\",\n    \"sdms\": 123456,\n    \"gender\": \"M\",\n    \"approved\": false,\n    \"made_in_competition\": true,\n    \"competition_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/world-records",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "world-records"
+              ]
+            },
+            "description": "Create a new world record"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"event\": \"100m T54 Men\",\n    \"athlete_class\": \"T54\",\n    \"performance\": \"13.45\",\n    \"location\": \"Olympic Stadium, Tokyo\",\n    \"npc\": \"USA\",\n    \"region_code\": \"AMER\",\n    \"record_date\": \"2024-08-15\",\n    \"record_type\": \"WR\",\n    \"sdms\": 123456,\n    \"gender\": \"M\",\n    \"approved\": false,\n    \"made_in_competition\": true,\n    \"competition_id\": 1\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/admin/world-records",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "world-records"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"id\": 1,\n    \"event\": \"100m T54 Men\",\n    \"athlete_class\": \"T54\",\n    \"performance\": \"13.45\",\n    \"location\": \"Olympic Stadium, Tokyo\",\n    \"npc\": \"USA\",\n    \"region_code\": \"AMER\",\n    \"record_date\": \"2024-08-15\",\n    \"record_type\": \"WR\",\n    \"sdms\": 123456,\n    \"gender\": \"M\",\n    \"approved\": false,\n    \"approved_by\": null,\n    \"approved_date\": null,\n    \"made_in_competition\": true,\n    \"competition_id\": 1,\n    \"created_at\": \"2024-08-27T15:30:00Z\",\n    \"athlete\": {\n        \"sdms\": 123456,\n        \"firstname\": \"John\",\n        \"lastname\": \"Smith\",\n        \"npc\": \"USA\",\n        \"gender\": \"M\",\n        \"class_\": \"T54\",\n        \"date_of_birth\": \"1990-05-15\",\n        \"photo\": \"https://example.com/photos/john_smith.jpg\",\n        \"is_guide\": false,\n        \"created_at\": \"2024-01-15T10:00:00Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Approve Single World Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/world-records/1/approve",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "world-records",
+                "1",
+                "approve"
+              ]
+            },
+            "description": "Approve a specific world record (AR or WR)"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/admin/world-records/1/approve",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "world-records",
+                    "1",
+                    "approve"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"id\": 1,\n    \"event\": \"100m T54 Men\",\n    \"athlete_class\": \"T54\",\n    \"performance\": \"13.45\",\n    \"location\": \"Olympic Stadium, Tokyo\",\n    \"npc\": \"USA\",\n    \"region_code\": \"AMER\",\n    \"record_date\": \"2024-08-15\",\n    \"record_type\": \"WR\",\n    \"sdms\": 123456,\n    \"gender\": \"M\",\n    \"approved\": true,\n    \"approved_by\": 1,\n    \"approved_date\": \"2024-08-27T15:35:00Z\",\n    \"made_in_competition\": true,\n    \"competition_id\": 1,\n    \"created_at\": \"2024-08-27T15:30:00Z\",\n    \"athlete\": {\n        \"sdms\": 123456,\n        \"firstname\": \"John\",\n        \"lastname\": \"Smith\",\n        \"npc\": \"USA\",\n        \"gender\": \"M\",\n        \"class_\": \"T54\",\n        \"date_of_birth\": \"1990-05-15\",\n        \"photo\": \"https://example.com/photos/john_smith.jpg\",\n        \"is_guide\": false,\n        \"created_at\": \"2024-01-15T10:00:00Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Approve Multiple World Records",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"record_ids\": [1, 2, 3]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/world-records/approve-multiple",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "world-records",
+                "approve-multiple"
+              ]
+            },
+            "description": "Approve multiple world records by IDs"
+          }
+        },
+        {
+          "name": "Disapprove Single World Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/world-records/1/disapprove",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "world-records",
+                "1",
+                "disapprove"
+              ]
+            },
+            "description": "Disapprove a specific world record (AR or WR)"
+          }
+        },
+        {
+          "name": "Disapprove Multiple World Records",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"record_ids\": [1, 2, 3]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/world-records/disapprove-multiple",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "world-records",
+                "disapprove-multiple"
+              ]
+            },
+            "description": "Disapprove multiple world records by IDs"
+          }
+        },
+        {
+          "name": "Delete Multiple World Records",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"record_ids\": [1, 2, 3]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/world-records/bulk-delete",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "world-records",
+                "bulk-delete"
+              ]
+            },
+            "description": "Delete multiple world records by IDs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Personal Bests",
+      "description": "All personal best management operations including CRUD, approval, and batch operations",
+      "item": [
+        {
+          "name": "Get All Personal Bests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/personal-bests?skip=0&limit=100",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "personal-bests"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Retrieve all personal best records"
+          }
+        },
+        {
+          "name": "Create Personal Best",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"sdms\": 123456,\n    \"event\": \"100m T54 Men\",\n    \"athlete_class\": \"T54\",\n    \"performance\": \"13.85\",\n    \"location\": \"National Stadium, City\",\n    \"record_date\": \"2024-08-15\",\n    \"approved\": false,\n    \"made_in_competition\": true,\n    \"competition_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/personal-bests",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "personal-bests"
+              ]
+            },
+            "description": "Create a new personal best record"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"sdms\": 123456,\n    \"event\": \"100m T54 Men\",\n    \"athlete_class\": \"T54\",\n    \"performance\": \"13.85\",\n    \"location\": \"National Stadium, City\",\n    \"record_date\": \"2024-08-15\",\n    \"approved\": false,\n    \"made_in_competition\": true,\n    \"competition_id\": 1\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/admin/personal-bests",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "personal-bests"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"id\": 1,\n    \"sdms\": 123456,\n    \"event\": \"100m T54 Men\",\n    \"athlete_class\": \"T54\",\n    \"performance\": \"13.85\",\n    \"location\": \"National Stadium, City\",\n    \"record_date\": \"2024-08-15\",\n    \"approved\": false,\n    \"approved_by\": null,\n    \"approved_date\": null,\n    \"made_in_competition\": true,\n    \"competition_id\": 1,\n    \"created_at\": \"2024-08-27T20:30:00Z\",\n    \"athlete\": {\n        \"sdms\": 123456,\n        \"firstname\": \"John\",\n        \"lastname\": \"Smith\",\n        \"npc\": \"USA\",\n        \"gender\": \"M\",\n        \"class_\": \"T54\",\n        \"date_of_birth\": \"1990-05-15\",\n        \"photo\": \"https://example.com/photos/john_smith.jpg\",\n        \"is_guide\": false,\n        \"created_at\": \"2024-01-15T10:00:00Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Approve Single Personal Best",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/personal-bests/1/approve",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "personal-bests",
+                "1",
+                "approve"
+              ]
+            },
+            "description": "Approve a specific personal best record"
+          }
+        },
+        {
+          "name": "Approve Multiple Personal Bests",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"record_ids\": [1, 2, 3]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/personal-bests/approve-multiple",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "personal-bests",
+                "approve-multiple"
+              ]
+            },
+            "description": "Approve multiple personal best records by IDs"
+          }
+        },
+        {
+          "name": "Disapprove Single Personal Best",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/personal-bests/1/disapprove",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "personal-bests",
+                "1",
+                "disapprove"
+              ]
+            },
+            "description": "Disapprove a specific personal best record"
+          }
+        },
+        {
+          "name": "Disapprove Multiple Personal Bests",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"record_ids\": [1, 2, 3]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/personal-bests/disapprove-multiple",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "personal-bests",
+                "disapprove-multiple"
+              ]
+            },
+            "description": "Disapprove multiple personal best records by IDs"
+          }
+        },
+        {
+          "name": "Delete Multiple Personal Bests",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"record_ids\": [1, 2, 3]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/personal-bests/bulk-delete",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "personal-bests",
+                "bulk-delete"
+              ]
+            },
+            "description": "Delete multiple personal best records by IDs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Medals",
+      "description": "All medal management operations including CRUD, ranking calculations, and manual overrides",
+      "item": [
+        {
+          "name": "Get All Medals",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/medals",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "medals"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "",
+                  "description": "Number of records to skip for pagination",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "",
+                  "description": "Maximum number of records to return",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Retrieve a paginated list of all medals"
+          }
+        },
+        {
+          "name": "Get Medal by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/medals/{{medal_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "medals",
+                "{{medal_id}}"
+              ]
+            },
+            "description": "Retrieve a specific medal by its ID"
+          }
+        },
+        {
+          "name": "Create Medal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"npc\": \"USA\",\n    \"gold\": 3,\n    \"silver\": 2,\n    \"bronze\": 1,\n    \"total\": 6,\n    \"rank\": null,\n    \"manual_override\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/medals",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "medals"
+              ]
+            },
+            "description": "Create a new medal record"
+          }
+        },
+        {
+          "name": "Update Medal (Full)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"npc\": \"USA\",\n    \"gold\": 5,\n    \"silver\": 3,\n    \"bronze\": 2,\n    \"total\": 10,\n    \"rank\": 1,\n    \"manual_override\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/medals/{{medal_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "medals",
+                "{{medal_id}}"
+              ]
+            },
+            "description": "Update all medal information (full replacement)"
+          }
+        },
+        {
+          "name": "Update Medal (Partial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"gold\": 6,\n    \"total\": 11\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/medals/{{medal_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "medals",
+                "{{medal_id}}"
+              ]
+            },
+            "description": "Partially update medal information"
+          }
+        },
+        {
+          "name": "Delete Medal",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/medals/{{medal_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "medals",
+                "{{medal_id}}"
+              ]
+            },
+            "description": "Delete a medal record"
+          }
+        },
+        {
+          "name": "Calculate Ranking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/medals/calculate-ranking",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "medals",
+                "calculate-ranking"
+              ]
+            },
+            "description": "Calculate ranking for all medals based on gold, silver, bronze count and update totals (excluding NPA)"
+          }
+        },
+        {
+          "name": "Set Manual Override",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/medals/{{medal_id}}/manual-override?rank={{rank}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "medals",
+                "{{medal_id}}",
+                "manual-override"
+              ],
+              "query": [
+                {
+                  "key": "rank",
+                  "value": "{{rank}}",
+                  "description": "Manual rank to assign"
+                }
+              ]
+            },
+            "description": "Manually override ranking for a specific medal and set manual_override to true"
+          }
+        },
+        {
+          "name": "Cancel Manual Override",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/medals/{{medal_id}}/manual-override",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "medals",
+                "{{medal_id}}",
+                "manual-override"
+              ]
+            },
+            "description": "Cancel manual override for a specific medal and recalculate its ranking"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Registrations",
+      "description": "All registration management operations including CRUD and batch operations",
+      "item": [
+        {
+          "name": "Get All Registrations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/registrations?skip=0&limit=100",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "registrations"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Retrieve all event registrations"
+          }
+        },
+        {
+          "name": "Create Registration",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"sdms\": 123456,\n    \"event_name\": \"100m T54 Men\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/registrations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "registrations"
+              ]
+            },
+            "description": "Create a new event registration"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"sdms\": 123456,\n    \"event_name\": \"100m T54 Men\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/v1/admin/registrations",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "registrations"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"id\": 1,\n    \"sdms\": 123456,\n    \"event_name\": \"100m T54 Men\",\n    \"created_at\": \"2024-08-27T20:30:00Z\",\n    \"athlete\": {\n        \"sdms\": 123456,\n        \"firstname\": \"John\",\n        \"lastname\": \"Smith\",\n        \"npc\": \"USA\",\n        \"gender\": \"M\",\n        \"class_\": \"T54\",\n        \"date_of_birth\": \"1990-05-15\",\n        \"photo\": \"https://example.com/photos/john_smith.jpg\",\n        \"is_guide\": false,\n        \"created_at\": \"2024-01-15T10:00:00Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Single Registration",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/registrations/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "registrations",
+                "1"
+              ]
+            },
+            "description": "Retrieve a specific athlete registration by its ID"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/admin/registrations/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "registrations",
+                    "1"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"id\": 1,\n    \"sdms\": 123456,\n    \"event_name\": \"100m T54 Men\",\n    \"created_at\": \"2024-08-27T20:30:00Z\",\n    \"athlete\": {\n        \"sdms\": 123456,\n        \"firstname\": \"John\",\n        \"lastname\": \"Smith\",\n        \"npc\": \"USA\",\n        \"gender\": \"M\",\n        \"class_\": \"T54\",\n        \"date_of_birth\": \"1990-05-15\",\n        \"photo\": \"https://example.com/photos/john_smith.jpg\",\n        \"is_guide\": false,\n        \"created_at\": \"2024-01-15T10:00:00Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Registration (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"event_name\": \"200m T54 Men\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/registrations/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "registrations",
+                "1"
+              ]
+            },
+            "description": "Update all registration information (full replacement)"
+          }
+        },
+        {
+          "name": "Update Registration (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"event_name\": \"400m T54 Men\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/registrations/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "registrations",
+                "1"
+              ]
+            },
+            "description": "Partially update registration information"
+          }
+        },
+        {
+          "name": "Delete Single Registration",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/registrations/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "registrations",
+                "1"
+              ]
+            },
+            "description": "Delete an athlete registration"
+          }
+        },
+        {
+          "name": "Delete Multiple Registrations",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"record_ids\": [1, 2, 3]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/registrations/bulk-delete",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "registrations",
+                "bulk-delete"
+              ]
+            },
+            "description": "Delete multiple athlete registrations by IDs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Relay Participants",
+      "description": "All relay participant management operations for team-based events",
+      "item": [
+        {
+          "name": "Get All Relay Participants",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/relay-participants?skip=0&limit=100",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "relay-participants"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Retrieve all relay participants"
+          }
+        },
+        {
+          "name": "Get Relay Participants by Result",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/relay-participants/result/{{result_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "relay-participants",
+                "result",
+                "{{result_id}}"
+              ]
+            },
+            "description": "Get all participants for a specific relay result"
+          }
+        },
+        {
+          "name": "Create Relay Participant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"result_id\": 1,\n    \"athlete_sdms\": 123456,\n    \"leg_number\": 1,\n    \"split_time\": 12.45,\n    \"is_starter\": true,\n    \"is_finisher\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/relay-participants",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "relay-participants"
+              ]
+            },
+            "description": "Create a new relay participant"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Competition Configs",
+      "description": "All competition configuration management operations",
+      "item": [
+        {
+          "name": "Get All Competition Configs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/competition-configs?skip=0&limit=100",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "competition-configs"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Retrieve all competition configurations"
+          }
+        },
+        {
+          "name": "Create Competition Config",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"config_name\": \"World Championships 2024\",\n    \"start_date\": \"2024-08-15\",\n    \"end_date\": \"2024-08-25\",\n    \"venue\": \"Olympic Stadium\",\n    \"location\": \"Paris, France\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/competition-configs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "competition-configs"
+              ]
+            },
+            "description": "Create a new competition configuration"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Competition Days",
+      "description": "All competition day management operations for scheduling events",
+      "item": [
+        {
+          "name": "Get All Competition Days",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/competition-days?skip=0&limit=100",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "competition-days"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Retrieve all competition days"
+          }
+        },
+        {
+          "name": "Create Competition Day",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"day_number\": 1,\n    \"date\": \"2024-08-15\",\n    \"description\": \"Opening Day - Track Events\",\n    \"session_start\": \"09:00:00\",\n    \"session_end\": \"18:00:00\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/competition-days",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "competition-days"
+              ]
+            },
+            "description": "Create a new competition day"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Heat Groups",
+      "description": "All heat group management operations for organizing competition heats",
+      "item": [
+        {
+          "name": "Get All Heat Groups",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/heat-groups?skip=0&limit=100",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "heat-groups"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Retrieve all heat groups"
+          }
+        },
+        {
+          "name": "Create Heat Group",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"game_id\": 1,\n    \"heat_number\": 1,\n    \"group_name\": \"Heat 1\",\n    \"start_time\": \"14:30:00\",\n    \"athletes_count\": 8\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/heat-groups",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "heat-groups"
+              ]
+            },
+            "description": "Create a new heat group"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Startlists",
+      "description": "All startlist management operations for competition participant lists",
+      "item": [
+        {
+          "name": "Get All Startlists",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/startlists?skip=0&limit=100",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "startlists"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Retrieve all startlists"
+          }
+        },
+        {
+          "name": "Create Startlist",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"game_id\": 1,\n    \"athlete_sdms\": 123456,\n    \"lane\": 4,\n    \"bib\": 101,\n    \"seed_time\": 12.50,\n    \"personal_best\": 12.45\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/startlists",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "startlists"
+              ]
+            },
+            "description": "Create a new startlist entry"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Config Tags",
+      "description": "All configuration tag management operations including CRUD operations for system configuration",
+      "item": [
+        {
+          "name": "Get All Config Tags",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/config-tags?skip=0&limit=100",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "config-tags"
+              ],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Retrieve a paginated list of all configuration tags"
+          }
+        },
+        {
+          "name": "Get Config Tag by Key",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/config-tags/key/{{config_key}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "config-tags",
+                "key",
+                "{{config_key}}"
+              ]
+            },
+            "description": "Retrieve a specific configuration tag by its key"
+          }
+        },
+        {
+          "name": "Get Config Tag by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/config-tags/{{tag_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "config-tags",
+                "{{tag_id}}"
+              ]
+            },
+            "description": "Retrieve a specific configuration tag by its ID"
+          }
+        },
+        {
+          "name": "Create Config Tag",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"config_key\": \"\",\n    \"config_value\": \"\",\n    \"description\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/config-tags",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "config-tags"
+              ]
+            },
+            "description": "Create a new configuration tag"
+          }
+        },
+        {
+          "name": "Update Config Tag (Full)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"config_key\": \"max_attempts\",\n    \"config_value\": \"6\",\n    \"description\": \"Maximum number of attempts allowed per athlete in field events\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/config-tags/{{tag_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "config-tags",
+                "{{tag_id}}"
+              ]
+            },
+            "description": "Update all config tag information (full replacement)"
+          }
+        },
+        {
+          "name": "Update Config Tag (Partial)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"config_value\": \"4\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/config-tags/{{tag_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "config-tags",
+                "{{tag_id}}"
+              ]
+            },
+            "description": "Partially update config tag information"
+          }
+        },
+        {
+          "name": "Delete Config Tag",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/config-tags/{{tag_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "config-tags",
+                "{{tag_id}}"
+              ]
+            },
+            "description": "Delete a configuration tag"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Official Operations",
+      "description": "Special administrative operations including ranking and qualifying processes",
+      "item": [
+        {
+          "name": "Auto Ranking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/official/auto-ranking/{{game_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "official",
+                "auto-ranking",
+                "{{game_id}}"
+              ],
+              "query": [
+                {
+                  "key": "wpa_points",
+                  "value": "",
+                  "description": "Whether to calculate WPA points (true/false)",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Automatically rank results for a specific game with optional WPA points calculation"
+          }
+        },
+        {
+          "name": "R1 Qualifying Process",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/official/r1-qualifying/{{game_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "official",
+                "r1-qualifying",
+                "{{game_id}}"
+              ]
+            },
+            "description": "Process R1 qualifying for a specific game"
+          }
+        },
+        {
+          "name": "Manual Ranking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/official/manual-ranking",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "official",
+                "manual-ranking"
+              ],
+              "query": [
+                {
+                  "key": "result_id",
+                  "value": "",
+                  "description": "ID of the result to rank"
+                },
+                {
+                  "key": "rank",
+                  "value": "",
+                  "description": "Manual rank to assign"
+                }
+              ]
+            },
+            "description": "Manually assign a rank to a specific result"
+          }
+        }
+      ]
+    }
+  ]
+}

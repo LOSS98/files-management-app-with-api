@@ -11,7 +11,7 @@ A modern, secure file management system with multi-application support. Built wi
 
 - **🔐 Dual Authentication**: JWT for admin panel, API keys for applications
 - **📁 Multi-Application Support**: Isolated file storage per application
-- **🖼️ Image Processing**: Convert images to WebP format for compression
+- **🖼️ Image Processing**: Convert images to WebP format for compression, SVG wrapper for scalability
 - **🌐 Public File Access**: Make files publicly accessible without authentication
 - **🛡️ Security First**: Input validation, file type restrictions, secure authentication
 - **⚡ Modern Stack**: TypeScript, React, Fastify, SQLite
@@ -104,6 +104,7 @@ GET    /api/files                            # List files
 PUT    /api/files/:id/rename                 # Rename file
 PATCH  /api/files/:id/visibility             # Toggle file visibility (public/private)
 POST   /api/files/:id/convert-to-webp        # Convert image to WebP
+POST   /api/files/:id/convert-to-svg         # Convert image to SVG
 DELETE /api/files/:id                       # Delete file
 GET    /api/files/:id/download               # Download file
 ```
@@ -115,7 +116,7 @@ GET    /public/:id/info                     # Get public file metadata
 ```
 
 ### File Upload & Access
-- **Allowed Types**: JPEG, PNG, GIF, WebP, PDF, Plain Text
+- **Allowed Types**: JPEG, PNG, GIF, WebP, SVG, PDF, Plain Text
 - **Max Size**: 1GB
 - **Security**: Filename sanitization, type validation
 - **Public Access**: Files can be made publicly accessible via `/public/{file_id}`
@@ -543,7 +544,7 @@ For security concerns, please review our [Security Policy](SECURITY.md).
 - **Backend**: TypeScript + Fastify + SQLite
 - **Frontend**: React 18.3+ + TypeScript + Tailwind CSS
 - **Security**: JWT + API Keys + Input Validation
-- **File Support**: Images, PDFs, Text files
+- **File Support**: Images (JPEG, PNG, GIF, WebP, SVG), PDFs, Text files
 - **Max File Size**: 1GB
 - **Date Format**: dd/mm/yyyy (French)
 
