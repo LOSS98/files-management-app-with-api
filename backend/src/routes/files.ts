@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import { database } from '../database';
 import { verifyApiKey } from '../auth';
+import { config } from '../config';
 import {
     generateUniqueFileName,
     convertImageToWebp,
@@ -58,14 +59,20 @@ export async function fileRoutes(fastify: FastifyInstance) {
             [fileId, application.id, originalName, uniqueName, filePath, data.mimetype, stats.size, isPublic ? 1 : 0]
         );
 
-        reply.send({
+        const response: any = {
             id: fileId,
             original_name: originalName,
             current_name: uniqueName,
             file_type: data.mimetype,
             size: stats.size,
             is_public: isPublic
-        });
+        };
+
+        if (isPublic) {
+            response.public_url = `${config.getBackendUrl()}/public/${fileId}`;
+        }
+
+        reply.send(response);
     });
 
     fastify.get('', (request) => {
@@ -73,10 +80,18 @@ export async function fileRoutes(fastify: FastifyInstance) {
         const files = database.all(
             'SELECT * FROM files WHERE application_id = ?',
             [application.id]
-        ).map((file: any) => ({
-            ...file,
-            is_public: file.is_public === 1
-        }));
+        ).map((file: any) => {
+            const mappedFile = {
+                ...file,
+                is_public: file.is_public === 1
+            };
+            
+            if (mappedFile.is_public) {
+                mappedFile.public_url = `${config.getBackendUrl()}/public/${file.id}`;
+            }
+            
+            return mappedFile;
+        });
         return { files };
     });
 
@@ -241,10 +256,16 @@ export async function fileRoutes(fastify: FastifyInstance) {
             [is_public ? 1 : 0, id]
         );
 
-        reply.send({ 
+        const response: any = { 
             success: true, 
             is_public: is_public,
             message: `File ${is_public ? 'made public' : 'made private'}` 
-        });
+        };
+
+        if (is_public) {
+            response.public_url = `${config.getBackendUrl()}/public/${id}`;
+        }
+
+        reply.send(response);
     });
 }

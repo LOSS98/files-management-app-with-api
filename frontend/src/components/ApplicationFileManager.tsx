@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { userAPI, createFileAPI, getErrorMessage } from '../services/api';
 import { Application, FileRecord } from '../types';
 import { formatDate } from '../utils/dateFormatter';
-import { Upload, Download, Edit2, Trash2, Image, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Upload, Download, Edit2, Trash2, Image, AlertCircle, Eye, EyeOff, Copy, Link } from 'lucide-react';
 
 export function ApplicationFileManager() {
     const { id } = useParams<{ id: string }>();
@@ -132,6 +132,15 @@ export function ApplicationFileManager() {
             setError('');
         } catch (error) {
             setError(getErrorMessage(error));
+        }
+    };
+
+    const copyToClipboard = async (text: string) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setError('');
+        } catch (error) {
+            setError('Failed to copy to clipboard');
         }
     };
 
@@ -267,6 +276,23 @@ export function ApplicationFileManager() {
                                                 {file.file_type} • {formatFileSize(file.size)} •
                                                 {formatDate(file.created_at)}
                                             </p>
+                                            {file.public_url && (
+                                                <div className="mt-2 flex items-center space-x-2">
+                                                    <div className="flex items-center bg-blue-50 rounded px-2 py-1">
+                                                        <Link className="h-3 w-3 text-blue-600 mr-1" />
+                                                        <span className="text-xs text-blue-600 font-mono truncate max-w-xs">
+                                                            {file.public_url}
+                                                        </span>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => copyToClipboard(file.public_url!)}
+                                                        className="text-blue-600 hover:text-blue-900"
+                                                        title="Copy public URL"
+                                                    >
+                                                        <Copy className="h-3 w-3" />
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>

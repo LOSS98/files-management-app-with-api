@@ -22,6 +22,7 @@ export interface FileRecord {
     file_type: string;
     size: number;
     is_public: boolean;
+    public_url?: string;
     created_at: string;
 }
 
