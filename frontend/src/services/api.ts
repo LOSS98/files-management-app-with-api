@@ -81,6 +81,7 @@ export const createFileAPI = (apiKey: string) => {
         toggleFileVisibility: (id: string, isPublic: boolean) =>
             fileAPI.patch(`/${id}/visibility`, { is_public: isPublic }),
         convertToWebp: (id: string) => fileAPI.post(`/${id}/convert-to-webp`),
+        convertToSvg: (id: string) => fileAPI.post(`/${id}/convert-to-svg`),
         deleteFile: (id: string) => fileAPI.delete(`/${id}`),
         downloadFile: (id: string) => fileAPI.get(`/${id}/download`, { responseType: 'blob' }),
     };

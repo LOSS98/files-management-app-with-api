@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { userAPI, createFileAPI, getErrorMessage } from '../services/api';
 import { Application, FileRecord } from '../types';
 import { formatDate } from '../utils/dateFormatter';
-import { Upload, Download, Edit2, Trash2, Image, AlertCircle, Eye, EyeOff, Copy, Link } from 'lucide-react';
+import { Upload, Download, Edit2, Trash2, Image, AlertCircle, Eye, EyeOff, Copy, Link, FileImage } from 'lucide-react';
 
 export function ApplicationFileManager() {
     const { id } = useParams<{ id: string }>();
@@ -94,6 +94,19 @@ export function ApplicationFileManager() {
         try {
             const fileAPI = createFileAPI(application.api_key);
             await fileAPI.convertToWebp(fileId);
+            loadApplication();
+            setError('');
+        } catch (error) {
+            setError(getErrorMessage(error));
+        }
+    };
+
+    const handleConvertToSvg = async (fileId: string) => {
+        if (!application) return;
+
+        try {
+            const fileAPI = createFileAPI(application.api_key);
+            await fileAPI.convertToSvg(fileId);
             loadApplication();
             setError('');
         } catch (error) {
@@ -297,13 +310,22 @@ export function ApplicationFileManager() {
                                     )}
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    {file.file_type.startsWith('image/') && file.file_type !== 'image/webp' && (
+                                    {file.file_type.startsWith('image/') && file.file_type !== 'image/webp' && file.file_type !== 'image/svg+xml' && (
                                         <button
                                             onClick={() => handleConvertToWebp(file.id)}
                                             className="text-purple-600 hover:text-purple-900"
                                             title="Convert to WebP"
                                         >
                                             <Image className="h-4 w-4" />
+                                        </button>
+                                    )}
+                                    {file.file_type.startsWith('image/') && file.file_type !== 'image/svg+xml' && (
+                                        <button
+                                            onClick={() => handleConvertToSvg(file.id)}
+                                            className="text-indigo-600 hover:text-indigo-900"
+                                            title="Convert to SVG"
+                                        >
+                                            <FileImage className="h-4 w-4" />
                                         </button>
                                     )}
                                     <button
