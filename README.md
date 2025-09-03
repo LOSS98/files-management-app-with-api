@@ -12,6 +12,7 @@ A modern, secure file management system with multi-application support. Built wi
 - **🔐 Dual Authentication**: JWT for admin panel, API keys for applications
 - **📁 Multi-Application Support**: Isolated file storage per application
 - **🖼️ Image Processing**: Convert images to WebP format for compression
+- **🌐 Public File Access**: Make files publicly accessible without authentication
 - **🛡️ Security First**: Input validation, file type restrictions, secure authentication
 - **⚡ Modern Stack**: TypeScript, React, Fastify, SQLite
 - **🐳 Docker Ready**: Complete containerization support
@@ -98,18 +99,28 @@ PUT    /api/admin/applications/:id/regenerate-key # Regenerate API key
 
 #### File Operations
 ```http
-POST   /api/files/upload                    # Upload file
-GET    /api/files/files                     # List files
-PUT    /api/files/files/:id/rename          # Rename file
-POST   /api/files/files/:id/convert-to-webp  # Convert image to WebP
-DELETE /api/files/files/:id                 # Delete file
-GET    /api/files/files/:id/download        # Download file
+POST   /api/files/upload                     # Upload file (with is_public option)
+GET    /api/files                            # List files
+PUT    /api/files/:id/rename                 # Rename file
+PATCH  /api/files/:id/visibility             # Toggle file visibility (public/private)
+POST   /api/files/:id/convert-to-webp        # Convert image to WebP
+DELETE /api/files/:id                       # Delete file
+GET    /api/files/:id/download               # Download file
 ```
 
-### File Upload Restrictions
+#### Public File Access
+```http
+GET    /public/:id                          # Access public file (no authentication)
+GET    /public/:id/info                     # Get public file metadata
+```
+
+### File Upload & Access
 - **Allowed Types**: JPEG, PNG, GIF, WebP, PDF, Plain Text
 - **Max Size**: 1GB
 - **Security**: Filename sanitization, type validation
+- **Public Access**: Files can be made publicly accessible via `/public/{file_id}`
+- **Privacy Control**: Toggle between public and private access per file
+- **Web Integration**: Public files perfect for `<img src="/public/{file_id}">` tags
 
 ## 🏗️ Architecture
 
@@ -170,6 +181,7 @@ CREATE TABLE files (
   file_path TEXT NOT NULL,
   file_type TEXT NOT NULL,       -- MIME type
   size INTEGER NOT NULL,         -- Bytes
+  is_public INTEGER DEFAULT 0,   -- 0 = private, 1 = public
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (application_id) REFERENCES applications (id)
 );
@@ -320,6 +332,17 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         client_max_body_size 1G;
+    }
+    
+    location /public {
+        proxy_pass http://localhost:3001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        
+        # Enable caching for public files
+        proxy_cache_valid 200 1y;
+        add_header Cache-Control "public, max-age=31536000";
     }
 }
 ```

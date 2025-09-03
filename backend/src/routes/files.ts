@@ -35,6 +35,15 @@ export async function fileRoutes(fastify: FastifyInstance) {
         }
 
         const { application } = request;
+        
+        let isPublic = false;
+        if (data.fields && 'is_public' in data.fields) {
+            const publicField = data.fields.is_public;
+            if (typeof publicField === 'object' && 'value' in publicField) {
+                isPublic = publicField.value === 'true';
+            }
+        }
+        
         const originalName = data.filename;
         const uniqueName = generateUniqueFileName(originalName);
         const filePath = path.join(application.folder_path, uniqueName);
@@ -45,8 +54,8 @@ export async function fileRoutes(fastify: FastifyInstance) {
         const fileId = uuidv4();
 
         database.run(
-            'INSERT INTO files (id, application_id, original_name, current_name, file_path, file_type, size) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [fileId, application.id, originalName, uniqueName, filePath, data.mimetype, stats.size]
+            'INSERT INTO files (id, application_id, original_name, current_name, file_path, file_type, size, is_public) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [fileId, application.id, originalName, uniqueName, filePath, data.mimetype, stats.size, isPublic ? 1 : 0]
         );
 
         reply.send({
@@ -54,7 +63,8 @@ export async function fileRoutes(fastify: FastifyInstance) {
             original_name: originalName,
             current_name: uniqueName,
             file_type: data.mimetype,
-            size: stats.size
+            size: stats.size,
+            is_public: isPublic
         });
     });
 
@@ -63,7 +73,10 @@ export async function fileRoutes(fastify: FastifyInstance) {
         const files = database.all(
             'SELECT * FROM files WHERE application_id = ?',
             [application.id]
-        );
+        ).map((file: any) => ({
+            ...file,
+            is_public: file.is_public === 1
+        }));
         return { files };
     });
 
@@ -141,8 +154,8 @@ export async function fileRoutes(fastify: FastifyInstance) {
             const webpFileId = uuidv4();
 
             database.run(
-                'INSERT INTO files (id, application_id, original_name, current_name, file_path, file_type, size) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                [webpFileId, application.id, file.original_name + ' (WebP)', webpFileName, webpPath, 'image/webp', stats.size]
+                'INSERT INTO files (id, application_id, original_name, current_name, file_path, file_type, size, is_public) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                [webpFileId, application.id, file.original_name + ' (WebP)', webpFileName, webpPath, 'image/webp', stats.size, file.is_public]
             );
 
             reply.send({
@@ -150,7 +163,8 @@ export async function fileRoutes(fastify: FastifyInstance) {
                 original_name: file.original_name + ' (WebP)',
                 current_name: webpFileName,
                 file_type: 'image/webp',
-                size: stats.size
+                size: stats.size,
+                is_public: file.is_public === 1
             });
         } catch (error) {
             reply.code(500).send({ error: 'Failed to convert image to WebP' });
@@ -200,5 +214,37 @@ export async function fileRoutes(fastify: FastifyInstance) {
         } catch (error) {
             reply.code(404).send({ error: 'File not found on disk' });
         }
+    });
+
+    fastify.patch('/:id/visibility', async (request, reply) => {
+        const { id } = request.params as { id: string };
+        const { is_public } = request.body as { is_public: boolean };
+        const { application } = request;
+
+        if (typeof is_public !== 'boolean') {
+            reply.code(400).send({ error: 'is_public must be a boolean value' });
+            return;
+        }
+
+        const file = database.get(
+            'SELECT * FROM files WHERE id = ? AND application_id = ?',
+            [id, application.id]
+        );
+
+        if (!file) {
+            reply.code(404).send({ error: 'File not found' });
+            return;
+        }
+
+        database.run(
+            'UPDATE files SET is_public = ? WHERE id = ?',
+            [is_public ? 1 : 0, id]
+        );
+
+        reply.send({ 
+            success: true, 
+            is_public: is_public,
+            message: `File ${is_public ? 'made public' : 'made private'}` 
+        });
     });
 }

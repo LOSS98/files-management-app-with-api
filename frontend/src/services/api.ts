@@ -69,14 +69,17 @@ export const createFileAPI = (apiKey: string) => {
     });
 
     return {
-        uploadFile: (file: File) => {
+        uploadFile: (file: File, isPublic: boolean = false) => {
             const formData = new FormData();
             formData.append('file', file);
+            formData.append('is_public', isPublic.toString());
             return fileAPI.post('/upload', formData);
         },
         getFiles: () => fileAPI.get(''),
         renameFile: (id: string, newName: string) =>
             fileAPI.put(`/${id}/rename`, { new_name: newName }),
+        toggleFileVisibility: (id: string, isPublic: boolean) =>
+            fileAPI.patch(`/${id}/visibility`, { is_public: isPublic }),
         convertToWebp: (id: string) => fileAPI.post(`/${id}/convert-to-webp`),
         deleteFile: (id: string) => fileAPI.delete(`/${id}`),
         downloadFile: (id: string) => fileAPI.get(`/${id}/download`, { responseType: 'blob' }),

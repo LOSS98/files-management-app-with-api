@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { userAPI, createFileAPI, getErrorMessage } from '../services/api';
 import { Application, FileRecord } from '../types';
 import { formatDate } from '../utils/dateFormatter';
-import { Upload, Download, Edit2, Trash2, Image, AlertCircle } from 'lucide-react';
+import { Upload, Download, Edit2, Trash2, Image, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export function ApplicationFileManager() {
     const { id } = useParams<{ id: string }>();
@@ -11,6 +11,7 @@ export function ApplicationFileManager() {
     const [files, setFiles] = useState<FileRecord[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [uploadFile, setUploadFile] = useState<File | null>(null);
+    const [isPublicUpload, setIsPublicUpload] = useState(false);
     const [editingFile, setEditingFile] = useState<{ id: string; name: string } | null>(null);
     const [error, setError] = useState('');
     const [isUploading, setIsUploading] = useState(false);
@@ -49,8 +50,9 @@ export function ApplicationFileManager() {
 
         try {
             const fileAPI = createFileAPI(application.api_key);
-            await fileAPI.uploadFile(uploadFile);
+            await fileAPI.uploadFile(uploadFile, isPublicUpload);
             setUploadFile(null);
+            setIsPublicUpload(false);
             loadApplication();
         } catch (error) {
             setError(getErrorMessage(error));
@@ -120,6 +122,19 @@ export function ApplicationFileManager() {
         }
     };
 
+    const handleToggleVisibility = async (fileId: string, currentVisibility: boolean) => {
+        if (!application) return;
+
+        try {
+            const fileAPI = createFileAPI(application.api_key);
+            await fileAPI.toggleFileVisibility(fileId, !currentVisibility);
+            loadApplication();
+            setError('');
+        } catch (error) {
+            setError(getErrorMessage(error));
+        }
+    };
+
     const formatFileSize = (bytes: number) => {
         if (bytes === 0) return '0 Bytes';
         const k = 1024;
@@ -170,20 +185,34 @@ export function ApplicationFileManager() {
                 <div className="px-4 py-5 sm:p-6">
                     <h3 className="text-lg leading-6 font-medium text-gray-900">Upload File</h3>
                     <form onSubmit={handleFileUpload} className="mt-5">
-                        <div className="flex items-center space-x-4">
-                            <input
-                                type="file"
-                                onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                            />
-                            <button
-                                type="submit"
-                                disabled={!uploadFile || isUploading}
-                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                            >
-                                <Upload className="h-4 w-4 mr-2" />
-                                {isUploading ? 'Uploading...' : 'Upload'}
-                            </button>
+                        <div className="space-y-4">
+                            <div className="flex items-center space-x-4">
+                                <input
+                                    type="file"
+                                    onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={!uploadFile || isUploading}
+                                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                                >
+                                    <Upload className="h-4 w-4 mr-2" />
+                                    {isUploading ? 'Uploading...' : 'Upload'}
+                                </button>
+                            </div>
+                            <div className="flex items-center">
+                                <input
+                                    id="is-public"
+                                    type="checkbox"
+                                    checked={isPublicUpload}
+                                    onChange={(e) => setIsPublicUpload(e.target.checked)}
+                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                />
+                                <label htmlFor="is-public" className="ml-2 block text-sm text-gray-700">
+                                    Make file publicly accessible (no authentication required)
+                                </label>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -218,9 +247,22 @@ export function ApplicationFileManager() {
                                         </div>
                                     ) : (
                                         <div>
-                                            <p className="text-sm font-medium text-gray-900">
-                                                {file.current_name}
-                                            </p>
+                                            <div className="flex items-center space-x-2">
+                                                <p className="text-sm font-medium text-gray-900">
+                                                    {file.current_name}
+                                                </p>
+                                                {file.is_public ? (
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                                                        <Eye className="h-3 w-3 mr-1" />
+                                                        Public
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                                        <EyeOff className="h-3 w-3 mr-1" />
+                                                        Private
+                                                    </span>
+                                                )}
+                                            </div>
                                             <p className="text-sm text-gray-500">
                                                 {file.file_type} • {formatFileSize(file.size)} •
                                                 {formatDate(file.created_at)}
@@ -238,6 +280,13 @@ export function ApplicationFileManager() {
                                             <Image className="h-4 w-4" />
                                         </button>
                                     )}
+                                    <button
+                                        onClick={() => handleToggleVisibility(file.id, file.is_public)}
+                                        className={file.is_public ? "text-orange-600 hover:text-orange-900" : "text-green-600 hover:text-green-900"}
+                                        title={file.is_public ? "Make Private" : "Make Public"}
+                                    >
+                                        {file.is_public ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </button>
                                     <button
                                         onClick={() => handleDownloadFile(file.id, file.current_name)}
                                         className="text-blue-600 hover:text-blue-900"

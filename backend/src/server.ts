@@ -7,6 +7,7 @@ import { authRoutes } from './routes/auth';
 import { adminRoutes } from './routes/admin';
 import { userRoutes } from './routes/user';
 import { fileRoutes } from './routes/files';
+import { publicRoutes } from './routes/public';
 import { config } from './config';
 
 const fastify = Fastify({ 
@@ -36,6 +37,7 @@ async function start() {
     await fastify.register(adminRoutes, { prefix: '/api/admin' });
     await fastify.register(userRoutes, { prefix: '/api/user' });
     await fastify.register(fileRoutes, { prefix: '/api/files' });
+    await fastify.register(publicRoutes, { prefix: '/public' });
 
     fastify.setErrorHandler((error, request, reply) => {
         fastify.log.error(error);

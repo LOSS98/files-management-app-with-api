@@ -42,6 +42,7 @@ export class Database {
                 file_path TEXT NOT NULL,
                 file_type TEXT NOT NULL,
                 size INTEGER NOT NULL,
+                is_public INTEGER DEFAULT 0,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (application_id) REFERENCES applications (id)
             )

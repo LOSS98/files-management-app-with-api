@@ -414,7 +414,7 @@
 			"name": "🚀 Application Management",
 			"item": [
 				{
-					"name": "Get All Applications",
+					"name": "Get All Applications (User)",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -425,13 +425,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/admin/applications",
+							"raw": "{{base_url}}/api/user/applications",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
-								"admin",
+								"user",
 								"applications"
 							]
 						},
@@ -770,6 +770,142 @@
 			"description": "🚀 **Application Management**\n\nComplete application lifecycle management with secure API key generation and isolated file storage."
 		},
 		{
+			"name": "🌐 Public File Access",
+			"item": [
+				{
+					"name": "Access Public File",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/public/{{file_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"public",
+								"{{file_id}}"
+							]
+						},
+						"description": "🌐 **Access Public File**\n\nRetrieve public files without authentication - perfect for web assets.\n\n**Authentication:** None required\n\n**📋 Requirements:**\n- File must be marked as public (`is_public: true`)\n- Valid file ID\n\n**📦 Response:**\n- Direct file content with appropriate MIME type\n- Browser-friendly display for images\n- Download behavior for documents\n- Caching headers for performance\n\n**🎯 Perfect for:**\n- HTML `<img src=\"/public/{file_id}\">` tags\n- CSS `background-image: url('/public/{file_id}')`\n- Direct document links\n- Public file sharing\n- CDN-style asset serving\n\n**⚡ Performance:**\n- Cached responses (1 year cache-control)\n- Optimized for web delivery\n- No authentication overhead\n\n**🔒 Security:**\n- Only public files accessible\n- Private files return 404\n- No directory traversal risks"
+					},
+					"response": [
+						{
+							"name": "✅ Public File Retrieved",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/public/public-file-uuid",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"public",
+										"public-file-uuid"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "image/jpeg"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "public, max-age=31536000"
+								}
+							],
+							"cookie": [],
+							"body": "[Binary file data - image content for display in browser]"
+						},
+						{
+							"name": "❌ File Not Public or Not Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/public/private-file-uuid",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"public",
+										"private-file-uuid"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": \"Public file not found\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Public File Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/public/{{file_id}}/info",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"public",
+								"{{file_id}}",
+								"info"
+							]
+						},
+						"description": "ℹ️ **Get Public File Metadata**\n\nRetrieve metadata about a public file without authentication.\n\n**Authentication:** None required\n\n**📋 Requirements:**\n- File must be marked as public\n- Valid file ID\n\n**📊 Response Data:**\n- File ID and names\n- File type and size\n- Creation date\n- Public status confirmation\n\n**🎯 Use Cases:**\n- File galleries with metadata\n- API integration for public files\n- File information displays\n- Public file catalogs\n\n**🔒 Security:**\n- No sensitive paths revealed\n- Only public file metadata\n- No application information exposed"
+					},
+					"response": [
+						{
+							"name": "✅ Public File Info Retrieved",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/public/public-file-uuid/info",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"public",
+										"public-file-uuid",
+										"info"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"public-file-uuid\",\n  \"original_name\": \"public-image.jpg\",\n  \"current_name\": \"public-image_uuid.jpg\",\n  \"file_type\": \"image/jpeg\",\n  \"size\": 512000,\n  \"created_at\": \"2024-01-15T14:22:00.000Z\",\n  \"is_public\": true\n}"
+						}
+					]
+				}
+			],
+			"description": "🌐 **Public File Access**\n\nAccess public files without authentication - perfect for web assets, images, and shared documents."
+		},
+		{
 			"name": "📁 File Operations",
 			"item": [
 				{
@@ -812,7 +948,13 @@
 									"key": "file",
 									"type": "file",
 									"src": [],
-									"description": "Select a file to upload (Images, PDFs, or text files up to 10MB)"
+									"description": "Select a file to upload (Images, PDFs, or text files up to 1GB)"
+								},
+								{
+									"key": "is_public",
+									"value": "false",
+									"description": "Set to 'true' to make file publicly accessible without authentication",
+									"type": "text"
 								}
 							]
 						},
@@ -827,7 +969,7 @@
 								"upload"
 							]
 						},
-						"description": "📤 **Upload File**\n\nUpload files with comprehensive security validation and processing.\n\n**Authentication:** API Key required (`X-API-Key` header)\n\n**📋 File Restrictions:**\n- **Allowed Types**: JPEG, PNG, GIF, WebP, PDF, Plain Text\n- **Max Size**: 10MB per file\n- **Security**: Filename sanitization, type validation\n\n**🔒 Security Features:**\n- MIME type validation\n- File size limits\n- Filename sanitization\n- UUID-based unique naming\n- Isolated storage per application\n\n**📁 Storage:**\n- Original filename preserved in metadata\n- Unique filename generated for storage\n- Organized by application folder\n\n**🎯 Use Cases:**\n- Document management\n- Image galleries\n- File sharing systems\n- Content management"
+						"description": "📤 **Upload File**\n\nUpload files with comprehensive security validation and processing.\n\n**Authentication:** API Key required (`X-API-Key` header)\n\n**📋 File Restrictions:**\n- **Allowed Types**: JPEG, PNG, GIF, WebP, PDF, Plain Text\n- **Max Size**: 1GB per file\n- **Security**: Filename sanitization, type validation\n\n**🔒 Security Features:**\n- MIME type validation\n- File size limits\n- Filename sanitization\n- UUID-based unique naming\n- Isolated storage per application\n\n**📁 Storage:**\n- Original filename preserved in metadata\n- Unique filename generated for storage\n- Organized by application folder\n\n**🔓 Public Access:**\n- Set `is_public` to `true` for public access\n- Public files accessible via `/public/{file_id}` without authentication\n- Perfect for images in HTML `<img src=\"/public/{file_id}\">` tags\n\n**🎯 Use Cases:**\n- Document management\n- Image galleries\n- File sharing systems\n- Content management\n- Public assets (images, documents)"
 					},
 					"response": [
 						{
@@ -873,7 +1015,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n  \"id\": \"file-uuid-1234\",\n  \"original_name\": \"document.pdf\",\n  \"current_name\": \"document_a1b2c3d4-e5f6-7890-abcd-ef1234567890.pdf\",\n  \"file_type\": \"application/pdf\",\n  \"size\": 1024000\n}"
+							"body": "{\n  \"id\": \"file-uuid-1234\",\n  \"original_name\": \"document.pdf\",\n  \"current_name\": \"document_a1b2c3d4-e5f6-7890-abcd-ef1234567890.pdf\",\n  \"file_type\": \"application/pdf\",\n  \"size\": 1024000,\n  \"is_public\": false\n}"
 						},
 						{
 							"name": "❌ File Type Not Allowed",
@@ -963,7 +1105,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n  \"error\": \"File too large. Maximum size is 10MB\"\n}"
+							"body": "{\n  \"error\": \"File too large. Maximum size is 1GB\"\n}"
 						}
 					]
 				},
@@ -979,13 +1121,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/files/files",
+							"raw": "{{base_url}}/api/files",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
-								"files",
 								"files"
 							]
 						},
@@ -1049,13 +1190,12 @@
 							"raw": "{\n  \"new_name\": \"my-renamed-document\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/files/files/{{file_id}}/rename",
+							"raw": "{{base_url}}/api/files/{{file_id}}/rename",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"api",
-								"files",
 								"files",
 								"{{file_id}}",
 								"rename"
@@ -1157,7 +1297,7 @@
 					]
 				},
 				{
-					"name": "Convert Image to SVG",
+					"name": "Convert Image to WebP",
 					"event": [
 						{
 							"listen": "test",
@@ -1382,6 +1522,130 @@
 							],
 							"cookie": [],
 							"body": "{\n  \"error\": \"File not found\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Toggle File Visibility",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "X-API-Key",
+								"value": "{{api_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"is_public\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/files/{{file_id}}/visibility",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"files",
+								"{{file_id}}",
+								"visibility"
+							]
+						},
+						"description": "👁️ **Toggle File Visibility**\n\nChange a file's visibility between public and private.\n\n**Authentication:** API Key required\n\n**📝 Request Body:**\n- `is_public`: Boolean value (true for public, false for private)\n\n**🔓 Public Files:**\n- Accessible via `/public/{file_id}` without authentication\n- Perfect for web assets, images, shared documents\n- Can be used directly in HTML tags\n\n**🔒 Private Files:**\n- Require API key authentication for access\n- Only accessible through authenticated endpoints\n- Default state for uploaded files\n\n**🎯 Use Cases:**\n- Making documents publicly shareable\n- Creating public image galleries\n- Controlling access to sensitive files\n- Converting private files to public assets"
+					},
+					"response": [
+						{
+							"name": "✅ File Made Public",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "X-API-Key",
+										"value": "{{api_key}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"is_public\": true\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/files/file-uuid/visibility",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"file-uuid",
+										"visibility"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"success\": true,\n  \"is_public\": true,\n  \"message\": \"File made public\"\n}"
+						},
+						{
+							"name": "✅ File Made Private",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "X-API-Key",
+										"value": "{{api_key}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"is_public\": false\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/api/files/file-uuid/visibility",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"files",
+										"file-uuid",
+										"visibility"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"success\": true,\n  \"is_public\": false,\n  \"message\": \"File made private\"\n}"
 						}
 					]
 				},
